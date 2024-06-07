@@ -7,6 +7,28 @@ from sqlalchemy.exc import SQLAlchemyError
 app = Flask(__name__)
 engine = create_engine("mysql+mysqlconnector://@localhost:3306/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
 
+@app.route('/mostrar_reservas', methods = ['GET'])
+def mostrar_reservas():
+    conn = engine.connect()
+    dni = request.get_json()
+    query = f"SELECT * FROM tabla_reservas WHERE id_personas == '{dni["dni_reserva"]}';"
+    
+    try:
+        result = conn.execute(text(query))
+        conn.close() 
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
+    
+    data = []
+    for row in result:
+        entity = {}
+        entity['id'] = row.id
+        entity['check_in'] = row.check_in
+        entity['check_out'] = row.check_out
+        entity['horario_reserva'] = row.horario_reserva
+        data.append(entity)
+
+    return jsonify(data), 200
 
 @app.route('/muestreo', methods = ['GET'])
 def users():
