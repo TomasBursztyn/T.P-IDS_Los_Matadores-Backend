@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 app = Flask(__name__)
-engine = create_engine("mysql+mysqlconnector://root@localhost:3307/tp_ids_db") #cambiar puerto al de tu base de datos, y nombre despues del /
+engine = create_engine("mysql+mysqlconnector://@localhost:3306/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
 
 
 @app.route('/muestreo', methods = ['GET'])
@@ -36,13 +36,13 @@ def users():
     return jsonify(data), 200
 
 
-@app.route('/create_user', methods = ['POST'])
-def create_user():
+@app.route('/crear_usuario', methods = ['POST'])
+def crear_usuario():
     conn = engine.connect()
-    new_user = request.get_json()
+    nuevo_usuario = request.get_json()
     #Se crea la query en base a los datos pasados por el endpoint.
     #Los mismos deben viajar en el body en formato JSON
-    query = f"""INSERT INTO tabla_personas (id_reserva, nombre, apellido, DNI, email, total_a_pagar) VALUES ('{new_user["id_reserva"]}','{new_user["nombre"]}', '{new_user["apellido"]}', '{new_user["DNI"]}', '{new_user["email"]}', '{new_user["total_a_pagar"]}');"""
+    query = f"""INSERT INTO tabla_personas (id_reserva, nombre, apellido, DNI, email, total_a_pagar) VALUES ('{nuevo_usuario["id_reserva"]}','{nuevo_usuario["nombre"]}', '{nuevo_usuario["apellido"]}', '{nuevo_usuario["DNI"]}', '{nuevo_usuario["email"]}', '{nuevo_usuario["total_a_pagar"]}');"""
     try:
         result = conn.execute(text(query))
         #Una vez ejecutada la consulta, se debe hacer commit de la misma para que
@@ -55,8 +55,8 @@ def create_user():
     return jsonify({'message': 'se ha agregado correctamente' + query}), 201
 
 
-@app.route('/users/<id>', methods = ['PATCH'])
-def update_user(id):
+@app.route('/usuario/<id>', methods = ['PATCH'])
+def actualizar_usuario(id):
     conn = engine.connect()
     mod_user = request.get_json()
     #De la misma manera que con el metodo POST los datos a modificar deberán
@@ -81,8 +81,8 @@ def update_user(id):
     return jsonify({'message': 'se ha modificado correctamente' + query}), 200
 
 
-@app.route('/users/<id>', methods = ['GET'])
-def get_user(id):
+@app.route('/usuario/<id>', methods = ['GET'])
+def get_usuario(id):
     conn = engine.connect()
     query = f"""SELECT *
             FROM tabla_personas
@@ -98,17 +98,19 @@ def get_user(id):
     if result.rowcount !=0:
         data = {}
         row = result.first()
-        data['id'] = row[0]
-        data['name'] = row[1]
-        data['email'] = row[2]
-        data['created_at'] = row[3]
+        data['id_reserva'] = row[0]
+        data['nombre'] = row[1]
+        data['apellido'] = row[2]
+        data['DNI'] = row[3]
+        data['email'] = row[4]
+        data['total_a_pagar'] = row[5]
         return jsonify(data), 200
 
     return jsonify({"message": "El usuario no existe"}), 404
 
 
-@app.route('/users/<id>', methods = ['DELETE'])
-def delete_user(id):
+@app.route('/usuario/<id>', methods = ['DELETE'])
+def delete_usuario(id):
     conn = engine.connect()
     query = f"""DELETE FROM tabla_personas
             WHERE id_reserva = {id};
@@ -127,6 +129,67 @@ def delete_user(id):
         return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
 
     return jsonify({'message': 'Se ha eliminado correctamente'}), 202
+
+@app.route('/reservas', methods = ['GET']) #Muestra todas las habitaciones de reservas
+def reservas():
+    conn = engine.connect()
+    
+    query = "SELECT * FROM tabla_reservas;"
+    try:
+        result = conn.execute(text(query))
+        conn.close() 
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
+    
+    data = []
+    for row in result:
+        entity = {}
+        entity['id'] = row.id
+        entity['check_in'] = row.check_in
+        entity['check_out'] = row.check_out
+        entity['horario_reserva'] = row.horario_reserva
+    #   entity['DNI'] = row.DNI             aca podriamos insertarlas para ver
+    #   entity['apellido'] = row.apellido   quien hizo la reserva
+        data.append(entity)
+
+    return jsonify(data), 200
+
+@app.route('/reservar', methods = ['POST']) # Crear reserva
+def crear_reserva():
+    conn = engine.connect()
+    nueva_reserva = request.get_json()
+    query = f"""INSERT INTO tabla_reservas (id, check_in, check_out, horario_reserva) VALUES ('{nueva_reserva["id"]}','{nueva_reserva["check_in"]}', '{nueva_reserva["check_out"]}', '{nueva_reserva["horario_reserva"]}');"""
+    try:
+        result = conn.execute(text(query))
+        conn.commit()
+        conn.close()
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
+    
+    return jsonify({'message': 'se ha agregado correctamente' + query}), 201
+
+@app.route('/reservas/<id>', methods = ['DELETE'])  # Borrar reserva por id
+def delete_reservas(id):
+    conn = engine.connect()
+    query = f"""DELETE FROM tabla_reservas
+            WHERE id = {id};
+            """
+    validation_query = f"SELECT * FROM tabla_reservas WHERE id = {id}"
+    try:
+        val_result = conn.execute(text(validation_query))
+        if val_result.rowcount != 0 :
+            result = conn.execute(text(query))
+            conn.commit()
+            conn.close()
+        else:
+            conn.close()
+            return jsonify({"message": "El usuario no existe"}), 404
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
+
+    return jsonify({'message': 'Se ha eliminado correctamente'}), 202
+
+
 
 
 if __name__ == "__main__":
