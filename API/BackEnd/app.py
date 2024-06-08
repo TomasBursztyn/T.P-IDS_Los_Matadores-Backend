@@ -5,9 +5,28 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 app = Flask(__name__)
-engine = create_engine("mysql+mysqlconnector://@localhost:3307/tp_ids_db") #cambiar puerto al de tu base de datos, y nombre despues del /
+engine = create_engine("mysql+mysqlconnector://@localhost:3306/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
 
-@app.route('/mostrar_reservas', methods = ['GET'])
+
+@app.route('/cargar_tabla', methods = ['POST'])
+def cargar_tabla():
+    conn = engine.connect()
+    nuevo_usuario = request.get_json()
+    #Se crea la query en base a los datos pasados por el endpoint.
+    #Los mismos deben viajar en el body en formato JSON
+    query = f"""INSERT INTO tabla_habitaciones (tipo_habitacion, precio_por_noche, cantidad_personas) VALUES ('{nuevo_usuario["tipo_habitacion"]}','{nuevo_usuario["precio_por_noche"]}', '{nuevo_usuario["cantidad_personas"]}');"""
+    try:
+        result = conn.execute(text(query))
+        #Una vez ejecutada la consulta, se debe hacer commit de la misma para que
+        #se aplique en la base de datos.
+        conn.commit()
+        conn.close()
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
+    
+    return jsonify({'message': 'se ha agregado correctamente' + query}), 201
+
+"""@app.route('/mostrar_reservas', methods = ['GET'])
 def mostrar_reservas():
     conn = engine.connect()
     dni = request.get_json()
@@ -64,7 +83,7 @@ def crear_usuario():
     nuevo_usuario = request.get_json()
     #Se crea la query en base a los datos pasados por el endpoint.
     #Los mismos deben viajar en el body en formato JSON
-    query = f"""INSERT INTO tabla_personas (id_reserva, nombre, apellido, DNI, email, total_a_pagar) VALUES ('{nuevo_usuario["id_reserva"]}','{nuevo_usuario["nombre"]}', '{nuevo_usuario["apellido"]}', '{nuevo_usuario["DNI"]}', '{nuevo_usuario["email"]}', '{nuevo_usuario["total_a_pagar"]}');"""
+    query = fINSERT INTO tabla_personas (id_reserva, nombre, apellido, DNI, email, total_a_pagar) VALUES ('{nuevo_usuario["id_reserva"]}','{nuevo_usuario["nombre"]}', '{nuevo_usuario["apellido"]}', '{nuevo_usuario["DNI"]}', '{nuevo_usuario["email"]}', '{nuevo_usuario["total_a_pagar"]}');
     try:
         result = conn.execute(text(query))
         #Una vez ejecutada la consulta, se debe hacer commit de la misma para que
@@ -83,10 +102,10 @@ def actualizar_usuario(id):
     mod_user = request.get_json()
     #De la misma manera que con el metodo POST los datos a modificar deberán
     #Ser enviados por medio del body de la request
-    query = f"""UPDATE tabla_personas SET nombre = '{mod_user['nombre']}'
+    query = fUPDATE tabla_personas SET nombre = '{mod_user['nombre']}'
                 {f", email = '{mod_user['email']}'" if "email" in mod_user else ""}
                 WHERE id_reserva = {id};
-            """
+            
     query_validation = f"SELECT * FROM tabla_personas WHERE id_reserva = {id};"
     try:
         val_result = conn.execute(text(query_validation))
@@ -106,10 +125,10 @@ def actualizar_usuario(id):
 @app.route('/usuario/<id>', methods = ['GET'])
 def get_usuario(id):
     conn = engine.connect()
-    query = f"""SELECT *
+    query = fSELECT *
             FROM tabla_personas
             WHERE id_reserva = {id};
-            """
+            
     try:
         result = conn.execute(text(query))
         conn.commit()
@@ -134,9 +153,9 @@ def get_usuario(id):
 @app.route('/usuario/<id>', methods = ['DELETE'])
 def delete_usuario(id):
     conn = engine.connect()
-    query = f"""DELETE FROM tabla_personas
+    query = fDELETE FROM tabla_personas
             WHERE id_reserva = {id};
-            """
+            
     validation_query = f"SELECT * FROM tabla_personas WHERE id_reserva = {id}"
     try:
         val_result = conn.execute(text(validation_query))
@@ -180,7 +199,7 @@ def reservas():
 def crear_reserva():
     conn = engine.connect()
     nueva_reserva = request.get_json()
-    query = f"""INSERT INTO tabla_reservas (id, check_in, check_out, horario_reserva) VALUES ('{nueva_reserva["id"]}','{nueva_reserva["check_in"]}', '{nueva_reserva["check_out"]}', '{nueva_reserva["horario_reserva"]}');"""
+    query = fINSERT INTO tabla_reservas (id, check_in, check_out, horario_reserva) VALUES ('{nueva_reserva["id"]}','{nueva_reserva["check_in"]}', '{nueva_reserva["check_out"]}', '{nueva_reserva["horario_reserva"]}');
     try:
         result = conn.execute(text(query))
         conn.commit()
@@ -193,9 +212,9 @@ def crear_reserva():
 @app.route('/reservas/<id>', methods = ['DELETE'])  # Borrar reserva por id
 def delete_reservas(id):
     conn = engine.connect()
-    query = f"""DELETE FROM tabla_reservas
+    query = fDELETE FROM tabla_reservas
             WHERE id = {id};
-            """
+            
     validation_query = f"SELECT * FROM tabla_reservas WHERE id = {id}"
     try:
         val_result = conn.execute(text(validation_query))
@@ -210,7 +229,7 @@ def delete_reservas(id):
         return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
 
     return jsonify({'message': 'Se ha eliminado correctamente'}), 202
-
+"""
 
 
 
