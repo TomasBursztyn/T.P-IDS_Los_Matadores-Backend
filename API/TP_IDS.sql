@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 08-06-2024 a las 22:00:56
+-- Tiempo de generación: 09-06-2024 a las 01:29:20
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -39,7 +39,21 @@ CREATE TABLE `tabla_habitaciones` (
 --
 
 INSERT INTO `tabla_habitaciones` (`id_habitacion`, `tipo_habitacion`, `precio_por_noche`, `cantidad_personas`) VALUES
-(1, 'flotante', 100, 2);
+(2, 'standard', 40, 4),
+(3, 'standard', 40, 4),
+(4, 'standard', 40, 4),
+(5, 'standard', 40, 4),
+(6, 'standard', 40, 4),
+(7, 'suite premium', 70, 6),
+(8, 'suite premium', 70, 6),
+(9, 'suite premium', 70, 6),
+(10, 'suite premium', 70, 6),
+(11, 'suite premium', 70, 6),
+(12, 'suite flotante', 100, 2),
+(13, 'suite flotante', 100, 2),
+(14, 'suite flotante', 100, 2),
+(15, 'suite flotante', 100, 2),
+(16, 'suite flotante', 100, 2);
 
 -- --------------------------------------------------------
 
@@ -109,13 +123,13 @@ ALTER TABLE `tabla_reservas`
 -- AUTO_INCREMENT de la tabla `tabla_habitaciones`
 --
 ALTER TABLE `tabla_habitaciones`
-  MODIFY `id_habitacion` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT;
+  MODIFY `id_habitacion` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de la tabla `tabla_personas`
 --
 ALTER TABLE `tabla_personas`
-  MODIFY `id_persona` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT;
+  MODIFY `id_persona` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `tabla_reservas`

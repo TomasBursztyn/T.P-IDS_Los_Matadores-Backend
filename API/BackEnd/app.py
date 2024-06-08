@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 app = Flask(__name__)
-engine = create_engine("mysql+mysqlconnector://@localhost:3306/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
+engine = create_engine("mysql+mysqlconnector://root@localhost:3307/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
 
 
 @app.route('/cargar_tabla', methods = ['POST'])
