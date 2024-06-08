@@ -50,13 +50,55 @@ def get_habitacion(id):
 
     return jsonify({"message": "El usuario no existe"}), 404
 
-# Borrar persona por id
+# Delete personas
 @app.route('/clientes/<id>', methods = ['DELETE'])  
 def delete_clientes(id):
     conn = engine.connect()
     query = f"""DELETE FROM tabla_personas WHERE id_persona = {id};"""
             
-    validation_query = f"SELECT * FROM tabla_reservas WHERE id = {id}"
+    validation_query = f"SELECT * FROM tabla_personas WHERE id_persona = {id}"
+    try:
+        val_result = conn.execute(text(validation_query))
+        if val_result.rowcount != 0 :
+            result = conn.execute(text(query))
+            conn.commit()
+            conn.close()
+        else:
+            conn.close()
+            return jsonify({"message": "El usuario no existe"}), 404
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
+
+    return jsonify({'message': 'Se ha eliminado correctamente'}), 202
+
+#Aca hacer delete de habitaciones
+@app.route('/clientes/<id>', methods = ['DELETE'])  
+def delete_clientes(id):
+    conn = engine.connect()
+    query = f"""DELETE FROM tabla_personas WHERE id_persona = {id};"""
+            
+    validation_query = f"SELECT * FROM tabla_personas WHERE id_persona = {id}"
+    try:
+        val_result = conn.execute(text(validation_query))
+        if val_result.rowcount != 0 :
+            result = conn.execute(text(query))
+            conn.commit()
+            conn.close()
+        else:
+            conn.close()
+            return jsonify({"message": "El usuario no existe"}), 404
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
+
+    return jsonify({'message': 'Se ha eliminado correctamente'}), 202
+
+#Aca hacer delete de reservas
+@app.route('/clientes/<id>', methods = ['DELETE'])  
+def delete_clientes(id):
+    conn = engine.connect()
+    query = f"""DELETE FROM tabla_personas WHERE id_persona = {id};"""
+            
+    validation_query = f"SELECT * FROM tabla_personas WHERE id_persona = {id}"
     try:
         val_result = conn.execute(text(validation_query))
         if val_result.rowcount != 0 :
