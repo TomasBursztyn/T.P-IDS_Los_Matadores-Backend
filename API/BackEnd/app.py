@@ -7,8 +7,9 @@ from sqlalchemy.exc import SQLAlchemyError
 app = Flask(__name__)
 engine = create_engine("mysql+mysqlconnector://@localhost:3306/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
 
-@app.route('/crear_usuario', methods = ['POST'])
-def crear_usuario():
+
+@app.route('/cargar_tabla', methods = ['POST'])
+def cargar_tabla():
     conn = engine.connect()
     nuevo_usuario = request.get_json()
     #Se crea la query en base a los datos pasados por el endpoint.
@@ -26,29 +27,28 @@ def crear_usuario():
     return jsonify({'message': 'se ha agregado correctamente' + query}), 201
 
 
-@app.route('/obtener_habitaciones', methods = ['GET'])
-def obtener_habitaciones():
+@app.route('/habitacion/<id>', methods = ['GET'])
+def get_habitacion(id):
     conn = engine.connect()
-    query = f"""SELECT * FROM tabla_habitaciones;"""
+    query = f"""SELECT * FROM tabla_habitaciones WHERE id_habitaciones = {id};"""
+            
     try:
-        #Se debe usar text para poder adecuarla al execute de mysql-connector
         result = conn.execute(text(query))
-        #Se hace commit de la consulta (acá no estoy seguro si es necesario para un select, sí es necesario para un insert!)
-        conn.close() #Cerramos la conexion con la base de datos
+        conn.commit()
+        conn.close()
     except SQLAlchemyError as err:
         return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
-    
-    #Se preparan los datos para ser mostrador como json
-    data = []
-    for row in result:
-        entity = {}
-        entity['id_habitacion'] = row.id_habitacion
-        entity['tipo_habitacion'] = row.tipo_habitacion
-        entity['precio_por_noche'] = row.precio_por_noche
-        entity['cantidad_personas'] = row.cantidad_personas
-        data.append(entity)
 
-    return jsonify(data), 200
+    if result.rowcount !=0:
+        data = {}
+        row = result.first()
+        data['id_habitacion'] = row[0]
+        data['tipo_habitacion'] = row[1]
+        data['precio_por_noche'] = row[2]
+        data['cantidad_personas'] = row[3]
+        return jsonify(data), 200
+
+    return jsonify({"message": "El usuario no existe"}), 404
 
 
 """@app.route('/mostrar_reservas', methods = ['GET'])
