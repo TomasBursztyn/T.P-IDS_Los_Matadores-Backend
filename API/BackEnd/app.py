@@ -8,23 +8,30 @@ app = Flask(__name__)
 engine = create_engine("mysql+mysqlconnector://@localhost:3306/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
 
 
-@app.route('/cargar_tabla', methods = ['POST'])
-def cargar_tabla():
+@app.route('/obtener_habitaciones', methods = ['GET'])
+def obtener_habitaciones():
     conn = engine.connect()
-    nuevo_usuario = request.get_json()
-    #Se crea la query en base a los datos pasados por el endpoint.
-    #Los mismos deben viajar en el body en formato JSON
-    query = f"""INSERT INTO tabla_habitaciones (tipo_habitacion, precio_por_noche, cantidad_personas) VALUES ('{nuevo_usuario["tipo_habitacion"]}','{nuevo_usuario["precio_por_noche"]}', '{nuevo_usuario["cantidad_personas"]}');"""
+    query = f"""SELECT * FROM tabla_habitaciones;"""
     try:
+        #Se debe usar text para poder adecuarla al execute de mysql-connector
         result = conn.execute(text(query))
-        #Una vez ejecutada la consulta, se debe hacer commit de la misma para que
-        #se aplique en la base de datos.
-        conn.commit()
-        conn.close()
+        #Se hace commit de la consulta (acá no estoy seguro si es necesario para un select, sí es necesario para un insert!)
+        conn.close() #Cerramos la conexion con la base de datos
     except SQLAlchemyError as err:
         return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
     
-    return jsonify({'message': 'se ha agregado correctamente' + query}), 201
+    #Se preparan los datos para ser mostrador como json
+    data = []
+    for row in result:
+        entity = {}
+        entity['id_habitacion'] = row.id_habitacion
+        entity['tipo_habitacion'] = row.tipo_habitacion
+        entity['precio_por_noche'] = row.precio_por_noche
+        entity['cantidad_personas'] = row.cantidad_personas
+        data.append(entity)
+
+    return jsonify(data), 200
+
 
 """@app.route('/mostrar_reservas', methods = ['GET'])
 def mostrar_reservas():
