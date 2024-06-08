@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 02-06-2024 a las 23:06:49
+-- Tiempo de generación: 08-06-2024 a las 22:00:56
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `TP IDS`
+-- Base de datos: `TP_IDS`
 --
 
 -- --------------------------------------------------------
@@ -28,12 +28,18 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `tabla_habitaciones` (
-  `id_habitacion` int(5) NOT NULL,
+  `id_habitacion` int(3) NOT NULL,
   `tipo_habitacion` varchar(50) NOT NULL,
-  `numero_piso` int(2) NOT NULL,
-  `cantidad_personas` int(2) NOT NULL,
-  `precio` int(6) NOT NULL
+  `precio_por_noche` int(6) NOT NULL,
+  `cantidad_personas` int(2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `tabla_habitaciones`
+--
+
+INSERT INTO `tabla_habitaciones` (`id_habitacion`, `tipo_habitacion`, `precio_por_noche`, `cantidad_personas`) VALUES
+(1, 'flotante', 100, 2);
 
 -- --------------------------------------------------------
 
@@ -42,13 +48,19 @@ CREATE TABLE `tabla_habitaciones` (
 --
 
 CREATE TABLE `tabla_personas` (
-  `id_reserva` int(5) NOT NULL,
-  `nombre` varchar(50) NOT NULL,
-  `apellido` varchar(50) NOT NULL,
-  `DNI` int(10) NOT NULL,
-  `email` varchar(50) NOT NULL,
-  `total_a_pagar` int(6) NOT NULL
+  `id_persona` int(5) NOT NULL,
+  `nombre_persona` varchar(50) NOT NULL,
+  `telefono_persona` int(15) NOT NULL,
+  `email_persona` varchar(50) NOT NULL,
+  `dni_persona` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `tabla_personas`
+--
+
+INSERT INTO `tabla_personas` (`id_persona`, `nombre_persona`, `telefono_persona`, `email_persona`, `dni_persona`) VALUES
+(5, 'julian', 1163665, 'jdjkajsdjl', 428394);
 
 -- --------------------------------------------------------
 
@@ -57,10 +69,12 @@ CREATE TABLE `tabla_personas` (
 --
 
 CREATE TABLE `tabla_reservas` (
-  `id` int(11) NOT NULL,
-  `check_in` date NOT NULL,
-  `check_out` date NOT NULL,
-  `horario_reserva` timestamp NOT NULL DEFAULT current_timestamp()
+  `id_reserva` int(5) NOT NULL,
+  `id_habitaciones` int(3) NOT NULL,
+  `id_personas` int(5) NOT NULL,
+  `fecha_inicio` date NOT NULL,
+  `fecha_salida` date NOT NULL,
+  `total_a_pagar` int(6) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -77,13 +91,15 @@ ALTER TABLE `tabla_habitaciones`
 -- Indices de la tabla `tabla_personas`
 --
 ALTER TABLE `tabla_personas`
-  ADD PRIMARY KEY (`id_reserva`);
+  ADD PRIMARY KEY (`id_persona`);
 
 --
 -- Indices de la tabla `tabla_reservas`
 --
 ALTER TABLE `tabla_reservas`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id_reserva`),
+  ADD KEY `fk_id_persona` (`id_personas`) USING BTREE,
+  ADD KEY `fk_id_habitacion` (`id_habitaciones`) USING BTREE;
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -93,7 +109,30 @@ ALTER TABLE `tabla_reservas`
 -- AUTO_INCREMENT de la tabla `tabla_habitaciones`
 --
 ALTER TABLE `tabla_habitaciones`
-  MODIFY `id_habitacion` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_habitacion` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `tabla_personas`
+--
+ALTER TABLE `tabla_personas`
+  MODIFY `id_persona` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `tabla_reservas`
+--
+ALTER TABLE `tabla_reservas`
+  MODIFY `id_reserva` int(5) NOT NULL AUTO_INCREMENT;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `tabla_reservas`
+--
+ALTER TABLE `tabla_reservas`
+  ADD CONSTRAINT `fk_padre` FOREIGN KEY (`id_personas`) REFERENCES `tabla_personas` (`id_persona`),
+  ADD CONSTRAINT `junior` FOREIGN KEY (`id_habitaciones`) REFERENCES `tabla_habitaciones` (`id_habitacion`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

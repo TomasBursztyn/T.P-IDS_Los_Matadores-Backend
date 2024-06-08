@@ -5,13 +5,13 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 app = Flask(__name__)
-engine = create_engine("mysql+mysqlconnector://@localhost:3306/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
+engine = create_engine("mysql+mysqlconnector://@localhost:3307/tp_ids_db") #cambiar puerto al de tu base de datos, y nombre despues del /
 
 @app.route('/mostrar_reservas', methods = ['GET'])
 def mostrar_reservas():
     conn = engine.connect()
     dni = request.get_json()
-    query = f"SELECT * FROM tabla_reservas WHERE id_personas == '{dni["dni_reserva"]}';"
+    query = f"SELECT * FROM tabla_reservas WHERE id_persona == '{dni["dni_reserva"]}';"
     
     try:
         result = conn.execute(text(query))
