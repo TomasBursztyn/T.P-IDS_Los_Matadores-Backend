@@ -30,7 +30,7 @@ def cargar_tabla():
 @app.route('/habitacion/<id>', methods = ['GET'])
 def get_habitacion(id):
     conn = engine.connect()
-    query = f"""SELECT * FROM tabla_habitaciones WHERE id_habitaciones = {id};"""
+    query = f"""SELECT * FROM tabla_habitaciones WHERE id_habitacion = {id};"""
             
     try:
         result = conn.execute(text(query))
@@ -70,7 +70,6 @@ def delete_clientes(id):
         return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
 
     return jsonify({'message': 'Se ha eliminado correctamente'}), 202
-"""
 
 
 """@app.route('/mostrar_reservas', methods = ['GET'])
