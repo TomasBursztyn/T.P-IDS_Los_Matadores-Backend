@@ -7,6 +7,24 @@ from sqlalchemy.exc import SQLAlchemyError
 app = Flask(__name__)
 engine = create_engine("mysql+mysqlconnector://@localhost:3306/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
 
+@app.route('/crear_usuario', methods = ['POST'])
+def crear_usuario():
+    conn = engine.connect()
+    nuevo_usuario = request.get_json()
+    #Se crea la query en base a los datos pasados por el endpoint.
+    #Los mismos deben viajar en el body en formato JSON
+    query = f"""INSERT INTO tabla_habitaciones (tipo_habitacion, precio_por_noche, cantidad_personas) VALUES ('{nuevo_usuario["tipo_habitacion"]}','{nuevo_usuario["precio_por_noche"]}', '{nuevo_usuario["cantidad_personas"]}');"""
+    try:
+        result = conn.execute(text(query))
+        #Una vez ejecutada la consulta, se debe hacer commit de la misma para que
+        #se aplique en la base de datos.
+        conn.commit()
+        conn.close()
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
+    
+    return jsonify({'message': 'se ha agregado correctamente' + query}), 201
+
 
 @app.route('/obtener_habitaciones', methods = ['GET'])
 def obtener_habitaciones():
