@@ -8,13 +8,13 @@ app = Flask(__name__)
 engine = create_engine("mysql+mysqlconnector://root@localhost:3307/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
 
 
-@app.route('/cargar_tabla', methods = ['POST'])
-def cargar_tabla():
+@app.route('/cargar_habitacion', methods = ['POST'])
+def cargar_habitacion():
     conn = engine.connect()
-    nuevo_usuario = request.get_json()
+    nueva_habitacion = request.get_json()
     #Se crea la query en base a los datos pasados por el endpoint.
     #Los mismos deben viajar en el body en formato JSON
-    query = f"""INSERT INTO tabla_habitaciones (tipo_habitacion, precio_por_noche, cantidad_personas) VALUES ('{nuevo_usuario["tipo_habitacion"]}','{nuevo_usuario["precio_por_noche"]}', '{nuevo_usuario["cantidad_personas"]}');"""
+    query = f"""INSERT INTO tabla_habitaciones (tipo_habitacion, precio_por_noche, cantidad_personas) VALUES ('{nueva_habitacion["tipo_habitacion"]}','{nueva_habitacion["precio_por_noche"]}', '{nueva_habitacion["cantidad_personas"]}');"""
     try:
         result = conn.execute(text(query))
         #Una vez ejecutada la consulta, se debe hacer commit de la misma para que
@@ -25,6 +25,35 @@ def cargar_tabla():
         return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
     
     return jsonify({'message': 'se ha agregado correctamente' + query}), 201
+
+@app.route('/cargar_clientes', methods = ['POST'])
+def cargar_cliente():
+    conn = engine.connect()
+    nuevo_cliente = request.get_json()
+    query = f"""INSERT INTO tabla_personas (id_persona, nombre_persona, telefono_persona, email_persona, dni_persona) VALUES ('{nuevo_cliente["id_persona"]}','{nuevo_cliente["nombre_persona"]}', '{nuevo_cliente["telefono_persona"]}', '{nuevo_cliente["email_persona"]}', '{nuevo_cliente["dni_persona"]}');"""
+    try:
+        result = conn.execute(text(query))
+        conn.commit()
+        conn.close()
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
+    
+    return jsonify({'message': 'se ha agregado correctamente' + query}), 201
+
+@app.route('/cargar_reserva', methods = ['POST'])
+def cargar_reserva():
+    conn = engine.connect()
+    nueva_reserva = request.get_json()
+    query = f"""INSERT INTO tabla_reservas (id_reserva, id_habitaciones, id_personas, fecha_inicio, fecha_salida, total_a_pagar) VALUES ('{nueva_reserva["id_reserva"]}','{nueva_reserva["id_habitaciones"]}', '{nueva_reserva["id_personas"]}', '{nueva_reserva["fecha_inicio"]}, '{nueva_reserva["fecha_salida"]}, '{nueva_reserva["total_a_pagar"]}');"""
+    try:
+        result = conn.execute(text(query))
+        conn.commit()
+        conn.close()
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
+    
+    return jsonify({'message': 'se ha agregado correctamente' + query}), 201
+
 
 
 @app.route('/habitacion/<id>', methods = ['GET'])
