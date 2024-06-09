@@ -7,6 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 app = Flask(__name__)
 engine = create_engine("mysql+mysqlconnector://root@localhost:3307/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
 
+# Endpoints POST para introducir valores en las tablas:
 
 @app.route('/cargar_habitacion', methods = ['POST'])
 def cargar_habitacion():
@@ -55,6 +56,84 @@ def cargar_reserva():
     return jsonify({'message': 'se ha agregado correctamente' + query}), 201
 
 
+# Endpoints GET para recibir todo lo que contienen las tablas:
+
+@app.route('/mostrar_habitaciones', methods = ['GET'])
+def get_habitaciones():
+    conn = engine.connect()
+    
+    query = "SELECT * FROM tabla_habitaciones;"
+    try:
+        #Se debe usar text para poder adecuarla al execute de mysql-connector
+        result = conn.execute(text(query))
+        #Se hace commit de la consulta (acá no estoy seguro si es necesario para un select, sí es necesario para un insert!)
+        conn.close() #Cerramos la conexion con la base de datos
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
+    
+    #Se preparan los datos para ser mostrador como json
+    data = []
+    for row in result:
+        entity = {}
+        entity['id_habitacion'] = row.id_habitacion
+        entity['tipo_habitacion'] = row.tipo_habitacion
+        entity['precio_por_noche'] = row.precio_por_noche
+        entity['cantidad_personas'] = row.cantidad_personas
+        data.append(entity)
+
+    return jsonify(data), 200
+
+@app.route('/mostrar_clientes', methods = ['GET'])
+def get_clientes():
+    conn = engine.connect()
+    
+    query = "SELECT * FROM tabla_personas;"
+    try:
+        result = conn.execute(text(query))
+        conn.close()
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
+    
+    data = []
+    for row in result:
+        entity = {}
+        entity['id_persona'] = row.id_persona
+        entity['nombre_persona'] = row.nombre_persona
+        entity['telefono_persona'] = row.telefono_persona
+        entity['email_persona'] = row.email_personas
+        entity['dni_persona'] = row.dni_personas
+        data.append(entity)
+
+    return jsonify(data), 200
+
+@app.route('/mostrar_reservas', methods = ['GET'])
+def get_reservas():
+    conn = engine.connect()
+    
+    query = "SELECT * FROM tabla_reservas;"
+    try:
+        result = conn.execute(text(query))
+        conn.close() 
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
+    
+    data = []
+    for row in result:
+        entity = {}
+        entity['id_reserva'] = row.id_reserva
+        entity['id_habitaciones'] = row.id_habitaciones
+        entity['id_personas'] = row.id_personas
+        entity['fecha_inicio'] = row.fecha_inicio
+        entity['fecha_salida'] = row.fecha_salida
+        entity['total_a_pagar'] = row.total_a_pagar
+
+        data.append(entity)
+
+    return jsonify(data), 200
+
+
+
+# Endpoint GET para buscar por id
 
 @app.route('/habitacion/<id>', methods = ['GET'])
 def get_habitacion(id):
