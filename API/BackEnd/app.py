@@ -50,48 +50,6 @@ def get_habitacion(id):
 
     return jsonify({"message": "El usuario no existe"}), 404
 
-# Delete personas
-@app.route('/clientes/<id>', methods = ['DELETE'])  
-def delete_clientes(id):
-    conn = engine.connect()
-    query = f"""DELETE FROM tabla_personas WHERE id_persona = {id};"""
-            
-    validation_query = f"SELECT * FROM tabla_personas WHERE id_persona = {id}"
-    try:
-        val_result = conn.execute(text(validation_query))
-        if val_result.rowcount != 0 :
-            result = conn.execute(text(query))
-            conn.commit()
-            conn.close()
-        else:
-            conn.close()
-            return jsonify({"message": "El usuario no existe"}), 404
-    except SQLAlchemyError as err:
-        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
-
-    return jsonify({'message': 'Se ha eliminado correctamente'}), 202
-
-#Aca hacer delete de habitaciones
-@app.route('/clientes/<id>', methods = ['DELETE'])  
-def delete_clientes(id):
-    conn = engine.connect()
-    query = f"""DELETE FROM tabla_personas WHERE id_persona = {id};"""
-            
-    validation_query = f"SELECT * FROM tabla_personas WHERE id_persona = {id}"
-    try:
-        val_result = conn.execute(text(validation_query))
-        if val_result.rowcount != 0 :
-            result = conn.execute(text(query))
-            conn.commit()
-            conn.close()
-        else:
-            conn.close()
-            return jsonify({"message": "El usuario no existe"}), 404
-    except SQLAlchemyError as err:
-        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
-
-    return jsonify({'message': 'Se ha eliminado correctamente'}), 202
-
 #Aca hacer delete de reservas
 @app.route('/clientes/<id>', methods = ['DELETE'])  
 def delete_clientes(id):
@@ -112,6 +70,31 @@ def delete_clientes(id):
         return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
 
     return jsonify({'message': 'Se ha eliminado correctamente'}), 202
+
+@app.route('/editar_habitacion/<id>', methods = ['PATCH'])
+def editar_habitacion(id):
+    conn = engine.connect()
+    datos_habitacion = request.get_json()
+    query = f"""
+        UPDATE tabla_habitaciones
+        SET {', '.join([f"{key} = '{value}'" for key, value in datos_habitacion.items()])}
+        WHERE id_habitacion = {id};
+    """
+    
+    validation_query = f"SELECT * FROM tabla_habitaciones WHERE id_habitacion = {id};"
+    try:
+        val_result = conn.execute(text(validation_query))
+        if val_result.rowcount != 0:
+            result = conn.execute(text(query))
+            conn.commit()
+            conn.close()
+        else:
+            conn.close()
+            return jsonify({"message": "La habitación no existe"}), 404
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error: ' + str(err.__cause__)}), 500
+
+    return jsonify({'message': 'Se ha modificado correctamente'}), 200
 
 
 """@app.route('/mostrar_reservas', methods = ['GET'])
