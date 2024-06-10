@@ -319,5 +319,42 @@ def editar_habitacion(id):
     return jsonify({'message': 'Se ha modificado correctamente'}), 200
 
 
+
+#Endpoint PATCH para modificar una reserva de la tabla_reservas por medio del id_reserva
+
+@app.route('/editar_reservas/<id>', methods = ['PATCH'])
+def editar_reservas(id):
+    conn = engine.connect()
+    datos_habitacion = request.get_json()
+    query = f"""
+        UPDATE tabla_reservas
+        SET {', '.join([f"{key} = '{value}'" for key, value in datos_habitacion.items()])}
+        WHERE id_reserva = {id};
+    """
+    
+    validation_query = f"SELECT * FROM tabla_reservas WHERE id_reserva = {id};"
+    try:
+        val_result = conn.execute(text(validation_query))
+        if val_result.rowcount != 0:
+            result = conn.execute(text(query))
+            conn.commit()
+            conn.close()
+        else:
+            conn.close()
+            return jsonify({"message": "La reserva no existe"}), 404
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error: ' + str(err.__cause__)}), 500
+
+    return jsonify({'message': 'Se ha modificado correctamente'}), 200
+
+
+
+
+
+
+
+
+
+
 if __name__ == "__main__":
     app.run("127.0.0.1", port="5000", debug=True)
