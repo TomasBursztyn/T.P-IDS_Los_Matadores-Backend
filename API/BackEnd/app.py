@@ -197,7 +197,31 @@ def get_clientes_id(id):
 
     return jsonify({"message": "El usuario no existe"}), 404
 
+#GET id reservas
+@app.route('/mostrar_reservas/<id>', methods = ['GET'])
+def get_reservas_id(id):
+    conn = engine.connect()
+    query = f"""SELECT * FROM tabla_reservas WHERE id_reserva = {id};"""
+            
+    try:
+        result = conn.execute(text(query))
+        conn.commit()
+        conn.close()
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
 
+    if result.rowcount !=0:
+        data = {}
+        row = result.first()
+        data['id_reserva'] = row[0]
+        data['id_habitaciones'] = row[1]
+        data['id_personas'] = row[2]
+        data['fecha_inicio'] = row[3]
+        data['fecha_salida'] = row[4]
+        data['total_a_pagar'] = row[5]
+        return jsonify(data), 200
+
+    return jsonify({"message": "La reserva no existe"}), 404
 
 
 # Endpoints DELETE
