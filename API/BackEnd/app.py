@@ -207,7 +207,7 @@ def editar_habitacion(id):
 
 # Endpoint DELETE para eliminar una habitacion de la tabla_habitaciones por medio del id_habitacion
 @app.route('/habitaciones/<id>', methods = ['DELETE'])  
-def delete_clientes(id):
+def delete_habitaciones(id):
     conn = engine.connect()
     query = f"""DELETE FROM tabla_habitaciones WHERE id_habitacion = {id};"""
             
