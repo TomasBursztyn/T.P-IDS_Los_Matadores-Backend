@@ -7,8 +7,13 @@ from sqlalchemy.exc import SQLAlchemyError
 app = Flask(__name__)
 engine = create_engine("mysql+mysqlconnector://root@localhost:3307/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
 
-# Endpoints POST para introducir valores en las tablas:
 
+# -----------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Endpoints:
+
+# Endpoints POST para introducir valores en las tablas:
+# POST habitacion
 @app.route('/cargar_habitacion', methods = ['POST'])
 def cargar_habitacion():
     conn = engine.connect()
@@ -27,6 +32,7 @@ def cargar_habitacion():
     
     return jsonify({'message': 'se ha agregado correctamente' + query}), 201
 
+# POST cliente
 @app.route('/cargar_clientes', methods = ['POST'])
 def cargar_cliente():
     conn = engine.connect()
@@ -41,6 +47,7 @@ def cargar_cliente():
     
     return jsonify({'message': 'se ha agregado correctamente' + query}), 201
 
+#POST reserva
 @app.route('/cargar_reserva', methods = ['POST'])
 def cargar_reserva():
     conn = engine.connect()
@@ -57,7 +64,7 @@ def cargar_reserva():
 
 
 # Endpoints GET para recibir todo lo que contienen las tablas:
-
+# GET habitaciones
 @app.route('/mostrar_habitaciones', methods = ['GET'])
 def get_habitaciones():
     conn = engine.connect()
@@ -83,6 +90,7 @@ def get_habitaciones():
 
     return jsonify(data), 200
 
+# GET clientes
 @app.route('/mostrar_clientes', methods = ['GET'])
 def get_clientes():
     conn = engine.connect()
@@ -106,6 +114,7 @@ def get_clientes():
 
     return jsonify(data), 200
 
+# GET reservas
 @app.route('/mostrar_reservas', methods = ['GET'])
 def get_reservas():
     conn = engine.connect()
@@ -133,8 +142,8 @@ def get_reservas():
 
 
 
-# Endpoint GET para buscar por id
-
+# Endpoints GET para buscar por id
+#GET id habitacion
 @app.route('/habitacion/<id>', methods = ['GET'])
 def get_habitacion(id):
     conn = engine.connect()
@@ -158,7 +167,11 @@ def get_habitacion(id):
 
     return jsonify({"message": "El usuario no existe"}), 404
 
-#Aca hacer delete de reservas
+
+
+
+# Endpoints DELETE
+# Delete de clientes(personas)
 @app.route('/clientes/<id>', methods = ['DELETE'])  
 def delete_clientes(id):
     conn = engine.connect()
@@ -178,6 +191,53 @@ def delete_clientes(id):
         return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
 
     return jsonify({'message': 'Se ha eliminado correctamente'}), 202
+
+
+# Endpoint DELETE para eliminar una habitacion de la tabla_habitaciones por medio del id_habitacion
+@app.route('/habitaciones/<id>', methods = ['DELETE'])  
+def delete_habitaciones(id):
+    conn = engine.connect()
+    query = f"""DELETE FROM tabla_habitaciones WHERE id_habitacion = {id};"""
+            
+    validation_query = f"SELECT * FROM tabla_habitaciones WHERE id_habitacion = {id}"
+    try:
+        val_result = conn.execute(text(validation_query))
+        if val_result.rowcount != 0 :
+            result = conn.execute(text(query))
+            conn.commit()
+            conn.close()
+        else:
+            conn.close()
+            return jsonify({"message": "La habitacion no existe"}), 404
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
+
+    return jsonify({'message': 'Se ha eliminado correctamente'}), 202
+
+# Borrar reserva
+@app.route('/reservas/<id>', methods = ['DELETE'])  
+def delete_reserva(id):
+    conn = engine.connect()
+    query = f"""DELETE FROM tabla_reservas WHERE id_reserva = {id};"""
+            
+    validation_query = f"SELECT * FROM tabla_reservas WHERE id_reserva = {id}"
+    try:
+        val_result = conn.execute(text(validation_query))
+        if val_result.rowcount != 0 :
+            result = conn.execute(text(query))
+            conn.commit()
+            conn.close()
+        else:
+            conn.close()
+            return jsonify({"message": "La reserva no existe"}), 404
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
+
+    return jsonify({'message': 'Se ha eliminado correctamente'}), 202
+
+
+# Endpoints PATCH
+# Editar habitacion
 
 @app.route('/editar_habitacion/<id>', methods = ['PATCH'])
 def editar_habitacion(id):
@@ -204,27 +264,6 @@ def editar_habitacion(id):
 
     return jsonify({'message': 'Se ha modificado correctamente'}), 200
 
-
-# Endpoint DELETE para eliminar una habitacion de la tabla_habitaciones por medio del id_habitacion
-@app.route('/habitaciones/<id>', methods = ['DELETE'])  
-def delete_habitaciones(id):
-    conn = engine.connect()
-    query = f"""DELETE FROM tabla_habitaciones WHERE id_habitacion = {id};"""
-            
-    validation_query = f"SELECT * FROM tabla_habitaciones WHERE id_habitacion = {id}"
-    try:
-        val_result = conn.execute(text(validation_query))
-        if val_result.rowcount != 0 :
-            result = conn.execute(text(query))
-            conn.commit()
-            conn.close()
-        else:
-            conn.close()
-            return jsonify({"message": "La habtacion no existe"}), 404
-    except SQLAlchemyError as err:
-        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
-
-    return jsonify({'message': 'Se ha eliminado correctamente'}), 202
 
 
 
