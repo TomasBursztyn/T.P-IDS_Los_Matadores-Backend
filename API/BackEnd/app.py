@@ -57,7 +57,7 @@ def cargar_reserva():
     cant_noches = int(salida[2]) - int(entrada[2])
     nueva_reserva["total_a_pagar"] = cant_noches * nueva_reserva["precio_por_noche"]
 
-    query = f"""INSERT INTO tabla_reservas (id_habitaciones, id_personas, fecha_inicio, fecha_salida, total_a_pagar) VALUES ('{nueva_reserva["id_habitaciones"]}', '{nueva_reserva["id_personas"]}', '{nueva_reserva["fecha_inicio"]}, '{nueva_reserva["fecha_salida"]}, '{nueva_reserva["total_a_pagar"]}');"""
+    query = f"""INSERT INTO tabla_reservas (id_habitaciones, id_personas, fecha_inicio, fecha_salida, total_a_pagar) VALUES ('{nueva_reserva["id_habitaciones"]}', '{nueva_reserva["id_personas"]}', '{nueva_reserva["fecha_inicio"]}', '{nueva_reserva["fecha_salida"]}', '{nueva_reserva["total_a_pagar"]}');"""
     try:
         result = conn.execute(text(query))
         conn.commit()
