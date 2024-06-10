@@ -37,7 +37,7 @@ def cargar_habitacion():
 def cargar_cliente():
     conn = engine.connect()
     nuevo_cliente = request.get_json()
-    query = f"""INSERT INTO tabla_personas (id_persona, nombre_persona, telefono_persona, email_persona, dni_persona) VALUES ('{nuevo_cliente["id_persona"]}','{nuevo_cliente["nombre_persona"]}', '{nuevo_cliente["telefono_persona"]}', '{nuevo_cliente["email_persona"]}', '{nuevo_cliente["dni_persona"]}');"""
+    query = f"""INSERT INTO tabla_personas (nombre_persona, telefono_persona, email_persona, dni_persona) VALUES ('{nuevo_cliente["nombre_persona"]}', '{nuevo_cliente["telefono_persona"]}', '{nuevo_cliente["email_persona"]}', '{nuevo_cliente["dni_persona"]}');"""
     try:
         result = conn.execute(text(query))
         conn.commit()
@@ -163,6 +163,31 @@ def get_habitacion(id):
         data['tipo_habitacion'] = row[1]
         data['precio_por_noche'] = row[2]
         data['cantidad_personas'] = row[3]
+        return jsonify(data), 200
+
+    return jsonify({"message": "La habitación no existe"}), 404
+
+#GET id clientes
+@app.route('/clientes/<id>', methods = ['GET'])
+def get_clientes_id(id):
+    conn = engine.connect()
+    query = f"""SELECT * FROM tabla_personas WHERE id_persona = {id};"""
+            
+    try:
+        result = conn.execute(text(query))
+        conn.commit()
+        conn.close()
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
+
+    if result.rowcount !=0:
+        data = {}
+        row = result.first()
+        data['id_persona'] = row[0]
+        data['nombre_persona'] = row[1]
+        data['telefono_persona'] = row[2]
+        data['email_persona'] = row[3]
+        data['dni_persona'] = row[4]
         return jsonify(data), 200
 
     return jsonify({"message": "El usuario no existe"}), 404
