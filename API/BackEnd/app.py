@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 app = Flask(__name__)
-engine = create_engine("mysql+mysqlconnector://root@localhost:3307/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
+engine = create_engine("mysql+mysqlconnector://root@localhost:3306/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
 
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -108,8 +108,8 @@ def get_clientes():
         entity['id_persona'] = row.id_persona
         entity['nombre_persona'] = row.nombre_persona
         entity['telefono_persona'] = row.telefono_persona
-        entity['email_persona'] = row.email_personas
-        entity['dni_persona'] = row.dni_personas
+        entity['email_persona'] = row.email_persona
+        entity['dni_persona'] = row.dni_persona
         data.append(entity)
 
     return jsonify(data), 200
