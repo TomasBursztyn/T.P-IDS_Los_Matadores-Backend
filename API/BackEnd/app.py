@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 app = Flask(__name__)
-engine = create_engine("mysql+mysqlconnector://root@localhost:3306/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
+engine = create_engine("mysql+mysqlconnector://root@localhost:3300/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
 
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -56,6 +56,13 @@ def cargar_reserva():
     entrada = nueva_reserva["fecha_inicio"].split("-")
     cant_noches = int(salida[2]) - int(entrada[2])
     nueva_reserva["total_a_pagar"] = cant_noches * nueva_reserva["precio_por_noche"]
+
+    if int(salida[1]) > int(entrada[1]):         
+        cant_noches = (int(salida[2]) - int(entrada[2]) + 30)     
+    else:         
+        cant_noches = int(salida[2]) - int(entrada[2])         
+        nueva_reserva["total_a_pagar"] = cant_noches * nueva_reserva["precio_por_noche"]
+    
 
     query = f"""INSERT INTO tabla_reservas (id_habitaciones, id_personas, fecha_inicio, fecha_salida, total_a_pagar) VALUES ('{nueva_reserva["id_habitaciones"]}', '{nueva_reserva["id_personas"]}', '{nueva_reserva["fecha_inicio"]}', '{nueva_reserva["fecha_salida"]}', '{nueva_reserva["total_a_pagar"]}');"""
     try:
