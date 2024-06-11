@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 app = Flask(__name__)
-engine = create_engine("mysql+mysqlconnector://root:123456@localhost:3307/tp_ids_db") #cambiar puerto al de tu base de datos, y nombre despues del /
+engine = create_engine("mysql+mysqlconnector://root@localhost:3306/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
 
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -225,7 +225,7 @@ def get_reservas_id(id):
 
 
 # Endpoints DELETE
-# Delete de clientes(personas)
+# DELETE clientes(personas)
 @app.route('/clientes/<id>', methods = ['DELETE'])  
 def delete_clientes(id):
     conn = engine.connect()
@@ -247,7 +247,7 @@ def delete_clientes(id):
     return jsonify({'message': 'Se ha eliminado correctamente'}), 202
 
 
-# Endpoint DELETE para eliminar una habitacion de la tabla_habitaciones por medio del id_habitacion
+# DELETE habitacion
 @app.route('/habitaciones/<id>', methods = ['DELETE'])  
 def delete_habitaciones(id):
     conn = engine.connect()
@@ -268,7 +268,7 @@ def delete_habitaciones(id):
 
     return jsonify({'message': 'Se ha eliminado correctamente'}), 202
 
-# Borrar reserva
+# DELETE reserva
 @app.route('/reservas/<id>', methods = ['DELETE'])  
 def delete_reserva(id):
     conn = engine.connect()
@@ -291,8 +291,7 @@ def delete_reserva(id):
 
 
 # Endpoints PATCH
-# Editar habitacion
-
+# PACH habitacion
 @app.route('/editar_habitacion/<id>', methods = ['PATCH'])
 def editar_habitacion(id):
     conn = engine.connect()
@@ -318,17 +317,40 @@ def editar_habitacion(id):
 
     return jsonify({'message': 'Se ha modificado correctamente'}), 200
 
+# PATCH clientes
+@app.route('/editar_cliente/<id>', methods = ['PATCH'])
+def editar_cliente(id):
+    conn = engine.connect()
+    datos_cliente = request.get_json()
+    query = f"""
+        UPDATE tabla_personas
+        SET {', '.join([f"{key} = '{value}'" for key, value in datos_cliente.items()])}
+        WHERE id_persona = {id};
+    """
+    
+    validation_query = f"SELECT * FROM tabla_personas WHERE id_persona = {id};"
+    try:
+        val_result = conn.execute(text(validation_query))
+        if val_result.rowcount != 0:
+            result = conn.execute(text(query))
+            conn.commit()
+            conn.close()
+        else:
+            conn.close()
+            return jsonify({"message": "El cliente no existe"}), 404
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error: ' + str(err.__cause__)}), 500
 
+    return jsonify({'message': 'Se ha modificado correctamente'}), 200
 
-#Endpoint PATCH para modificar una reserva de la tabla_reservas por medio del id_reserva
-
-@app.route('/editar_reservas/<id>', methods = ['PATCH'])
+# PATCH reserva
+@app.route('/editar_reserva/<id>', methods = ['PATCH'])
 def editar_reservas(id):
     conn = engine.connect()
-    datos_habitacion = request.get_json()
+    datos_reserva = request.get_json()
     query = f"""
         UPDATE tabla_reservas
-        SET {', '.join([f"{key} = '{value}'" for key, value in datos_habitacion.items()])}
+        SET {', '.join([f"{key} = '{value}'" for key, value in datos_reserva.items()])}
         WHERE id_reserva = {id};
     """
     
