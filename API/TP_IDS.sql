@@ -27,7 +27,7 @@ SET time_zone = "+00:00";
 -- Estructura de tabla para la tabla `tabla_habitaciones`
 --
 
-CREATE TABLE `tabla_habitaciones` (
+CREATE TABLE `habitaciones` (
   `id_habitacion` int(3) NOT NULL,
   `tipo_habitacion` varchar(50) NOT NULL,
   `precio_por_noche` int(6) NOT NULL,
@@ -35,10 +35,10 @@ CREATE TABLE `tabla_habitaciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `tabla_habitaciones`
+-- Volcado de datos para la tabla `habitaciones`
 --
 
-INSERT INTO `tabla_habitaciones` (`id_habitacion`, `tipo_habitacion`, `precio_por_noche`, `cantidad_personas`) VALUES
+INSERT INTO `habitaciones` (`id_habitacion`, `tipo_habitacion`, `precio_por_noche`, `cantidad_personas`) VALUES
 (2, 'standard', 40, 4),
 (3, 'standard', 40, 4),
 (4, 'standard', 40, 4),
@@ -58,10 +58,10 @@ INSERT INTO `tabla_habitaciones` (`id_habitacion`, `tipo_habitacion`, `precio_po
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `tabla_personas`
+-- Estructura de tabla para la tabla `personas`
 --
 
-CREATE TABLE `tabla_personas` (
+CREATE TABLE `personas` (
   `id_persona` int(5) NOT NULL,
   `nombre_persona` varchar(50) NOT NULL,
   `telefono_persona` int(15) NOT NULL,
@@ -70,19 +70,19 @@ CREATE TABLE `tabla_personas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `tabla_personas`
+-- Volcado de datos para la tabla `personas`
 --
 
-INSERT INTO `tabla_personas` (`id_persona`, `nombre_persona`, `telefono_persona`, `email_persona`, `dni_persona`) VALUES
+INSERT INTO `personas` (`id_persona`, `nombre_persona`, `telefono_persona`, `email_persona`, `dni_persona`) VALUES
 (5, 'julian', 1163665, 'jdjkajsdjl', 428394);
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `tabla_reservas`
+-- Estructura de tabla para la tabla `reservas`
 --
 
-CREATE TABLE `tabla_reservas` (
+CREATE TABLE `reservas` (
   `id_reserva` int(5) NOT NULL,
   `id_habitaciones` int(3) NOT NULL,
   `id_personas` int(5) NOT NULL,
@@ -96,21 +96,21 @@ CREATE TABLE `tabla_reservas` (
 --
 
 --
--- Indices de la tabla `tabla_habitaciones`
+-- Indices de la tabla `habitaciones`
 --
-ALTER TABLE `tabla_habitaciones`
+ALTER TABLE `habitaciones`
   ADD PRIMARY KEY (`id_habitacion`);
 
 --
 -- Indices de la tabla `tabla_personas`
 --
-ALTER TABLE `tabla_personas`
+ALTER TABLE `personas`
   ADD PRIMARY KEY (`id_persona`);
 
 --
--- Indices de la tabla `tabla_reservas`
+-- Indices de la tabla `reservas`
 --
-ALTER TABLE `tabla_reservas`
+ALTER TABLE `reservas`
   ADD PRIMARY KEY (`id_reserva`),
   ADD KEY `fk_id_persona` (`id_personas`) USING BTREE,
   ADD KEY `fk_id_habitacion` (`id_habitaciones`) USING BTREE;
@@ -120,21 +120,21 @@ ALTER TABLE `tabla_reservas`
 --
 
 --
--- AUTO_INCREMENT de la tabla `tabla_habitaciones`
+-- AUTO_INCREMENT de la tabla `habitaciones`
 --
-ALTER TABLE `tabla_habitaciones`
+ALTER TABLE `habitaciones`
   MODIFY `id_habitacion` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
--- AUTO_INCREMENT de la tabla `tabla_personas`
+-- AUTO_INCREMENT de la tabla `personas`
 --
-ALTER TABLE `tabla_personas`
+ALTER TABLE `personas`
   MODIFY `id_persona` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT de la tabla `tabla_reservas`
+-- AUTO_INCREMENT de la tabla `reservas`
 --
-ALTER TABLE `tabla_reservas`
+ALTER TABLE `reservas`
   MODIFY `id_reserva` int(5) NOT NULL AUTO_INCREMENT;
 
 --
@@ -142,9 +142,9 @@ ALTER TABLE `tabla_reservas`
 --
 
 --
--- Filtros para la tabla `tabla_reservas`
+-- Filtros para la tabla `reservas`
 --
-ALTER TABLE `tabla_reservas`
+ALTER TABLE `reservas`
   ADD CONSTRAINT `fk_padre` FOREIGN KEY (`id_personas`) REFERENCES `tabla_personas` (`id_persona`),
   ADD CONSTRAINT `junior` FOREIGN KEY (`id_habitaciones`) REFERENCES `tabla_habitaciones` (`id_habitacion`);
 COMMIT;
