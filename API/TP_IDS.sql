@@ -145,8 +145,8 @@ ALTER TABLE `reservas`
 -- Filtros para la tabla `reservas`
 --
 ALTER TABLE `reservas`
-  ADD CONSTRAINT `fk_padre` FOREIGN KEY (`id_personas`) REFERENCES `tabla_personas` (`id_persona`),
-  ADD CONSTRAINT `junior` FOREIGN KEY (`id_habitaciones`) REFERENCES `tabla_habitaciones` (`id_habitacion`);
+  ADD CONSTRAINT `fk_padre` FOREIGN KEY (`id_personas`) REFERENCES `personas` (`id_persona`),
+  ADD CONSTRAINT `junior` FOREIGN KEY (`id_habitaciones`) REFERENCES `habitaciones` (`id_habitacion`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
