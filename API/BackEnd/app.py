@@ -54,11 +54,18 @@ def cargar_reserva():
     nueva_reserva = request.get_json()
     salida = nueva_reserva["fecha_salida"].split("-")
     entrada = nueva_reserva["fecha_inicio"].split("-")
+    conseguir_precio =  f"""SELECT precio_por_noche FROM habitaciones WHERE id_habitacion = {nueva_reserva["id_habitaciones"]};"""
+    
+    try:
+        result = conn.execute(text(conseguir_precio))
+    except SQLAlchemyError as err:
+        return jsonify({'message': 'Se ha producido un error' + str(err.__cause__)}), 500
+    
     if int(salida[1]) > int(entrada[1]):
         cant_noches = (int(salida[1]) - int(entrada[1])) * 30 + int(salida[2]) - int(entrada[2])
     else:
         cant_noches = int(salida[2]) - int(entrada[2])
-    nueva_reserva["total_a_pagar"] = cant_noches * nueva_reserva["precio_por_noche"]
+    nueva_reserva["total_a_pagar"] = cant_noches * result.first()[0]
 
     query = f"""INSERT INTO reservas (id_habitaciones, id_personas, fecha_inicio, fecha_salida, total_a_pagar) VALUES ('{nueva_reserva["id_habitaciones"]}', '{nueva_reserva["id_personas"]}', '{nueva_reserva["fecha_inicio"]}', '{nueva_reserva["fecha_salida"]}', '{nueva_reserva["total_a_pagar"]}');"""
     try:
@@ -201,8 +208,8 @@ def get_clientes_id(id):
     return jsonify({"message": "El usuario no existe"}), 404
 
 #GET dni clientes
-@app.route('/clientes/<dni>', methods = ['GET'])
-def get_clientes_id(dni):
+@app.route('/clientes_dni/<dni>', methods = ['GET'])
+def get_clientes_dni(dni):
     conn = engine.connect()
     query = f"""SELECT * FROM personas WHERE dni_persona = {dni};"""
             
