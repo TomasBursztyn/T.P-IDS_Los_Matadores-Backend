@@ -20,7 +20,7 @@ def cargar_habitacion():
     nueva_habitacion = request.get_json()
     #Se crea la query en base a los datos pasados por el endpoint.
     #Los mismos deben viajar en el body en formato JSON
-    query = f"""INSERT INTO tabla_habitaciones (tipo_habitacion, precio_por_noche, cantidad_personas) VALUES ('{nueva_habitacion["tipo_habitacion"]}','{nueva_habitacion["precio_por_noche"]}', '{nueva_habitacion["cantidad_personas"]}');"""
+    query = f"""INSERT INTO habitaciones (tipo_habitacion, precio_por_noche, cantidad_personas) VALUES ('{nueva_habitacion["tipo_habitacion"]}','{nueva_habitacion["precio_por_noche"]}', '{nueva_habitacion["cantidad_personas"]}');"""
     try:
         result = conn.execute(text(query))
         #Una vez ejecutada la consulta, se debe hacer commit de la misma para que
@@ -37,7 +37,7 @@ def cargar_habitacion():
 def cargar_cliente():
     conn = engine.connect()
     nuevo_cliente = request.get_json()
-    query = f"""INSERT INTO tabla_personas (nombre_persona, telefono_persona, email_persona, dni_persona) VALUES ('{nuevo_cliente["nombre_persona"]}', '{nuevo_cliente["telefono_persona"]}', '{nuevo_cliente["email_persona"]}', '{nuevo_cliente["dni_persona"]}');"""
+    query = f"""INSERT INTO personas (nombre_persona, telefono_persona, email_persona, dni_persona) VALUES ('{nuevo_cliente["nombre_persona"]}', '{nuevo_cliente["telefono_persona"]}', '{nuevo_cliente["email_persona"]}', '{nuevo_cliente["dni_persona"]}');"""
     try:
         result = conn.execute(text(query))
         conn.commit()
@@ -60,7 +60,7 @@ def cargar_reserva():
         cant_noches = int(salida[2]) - int(entrada[2])
     nueva_reserva["total_a_pagar"] = cant_noches * nueva_reserva["precio_por_noche"]
 
-    query = f"""INSERT INTO tabla_reservas (id_habitaciones, id_personas, fecha_inicio, fecha_salida, total_a_pagar) VALUES ('{nueva_reserva["id_habitaciones"]}', '{nueva_reserva["id_personas"]}', '{nueva_reserva["fecha_inicio"]}', '{nueva_reserva["fecha_salida"]}', '{nueva_reserva["total_a_pagar"]}');"""
+    query = f"""INSERT INTO reservas (id_habitaciones, id_personas, fecha_inicio, fecha_salida, total_a_pagar) VALUES ('{nueva_reserva["id_habitaciones"]}', '{nueva_reserva["id_personas"]}', '{nueva_reserva["fecha_inicio"]}', '{nueva_reserva["fecha_salida"]}', '{nueva_reserva["total_a_pagar"]}');"""
     try:
         result = conn.execute(text(query))
         conn.commit()
@@ -77,7 +77,7 @@ def cargar_reserva():
 def get_habitaciones():
     conn = engine.connect()
     
-    query = "SELECT * FROM tabla_habitaciones;"
+    query = "SELECT * FROM habitaciones;"
     try:
         #Se debe usar text para poder adecuarla al execute de mysql-connector
         result = conn.execute(text(query))
@@ -103,7 +103,7 @@ def get_habitaciones():
 def get_clientes():
     conn = engine.connect()
     
-    query = "SELECT * FROM tabla_personas;"
+    query = "SELECT * FROM personas;"
     try:
         result = conn.execute(text(query))
         conn.close()
@@ -127,7 +127,7 @@ def get_clientes():
 def get_reservas():
     conn = engine.connect()
     
-    query = "SELECT * FROM tabla_reservas;"
+    query = "SELECT * FROM reservas;"
     try:
         result = conn.execute(text(query))
         conn.close() 
@@ -155,7 +155,7 @@ def get_reservas():
 @app.route('/habitacion/<id>', methods = ['GET'])
 def get_habitacion(id):
     conn = engine.connect()
-    query = f"""SELECT * FROM tabla_habitaciones WHERE id_habitacion = {id};"""
+    query = f"""SELECT * FROM habitaciones WHERE id_habitacion = {id};"""
             
     try:
         result = conn.execute(text(query))
@@ -179,7 +179,7 @@ def get_habitacion(id):
 @app.route('/clientes/<id>', methods = ['GET'])
 def get_clientes_id(id):
     conn = engine.connect()
-    query = f"""SELECT * FROM tabla_personas WHERE id_persona = {id};"""
+    query = f"""SELECT * FROM personas WHERE id_persona = {id};"""
             
     try:
         result = conn.execute(text(query))
@@ -204,7 +204,7 @@ def get_clientes_id(id):
 @app.route('/mostrar_reservas/<id>', methods = ['GET'])
 def get_reservas_id(id):
     conn = engine.connect()
-    query = f"""SELECT * FROM tabla_reservas WHERE id_reserva = {id};"""
+    query = f"""SELECT * FROM reservas WHERE id_reserva = {id};"""
             
     try:
         result = conn.execute(text(query))
@@ -232,9 +232,9 @@ def get_reservas_id(id):
 @app.route('/clientes/<id>', methods = ['DELETE'])  
 def delete_clientes(id):
     conn = engine.connect()
-    query = f"""DELETE FROM tabla_personas WHERE id_persona = {id};"""
+    query = f"""DELETE FROM personas WHERE id_persona = {id};"""
             
-    validation_query = f"SELECT * FROM tabla_personas WHERE id_persona = {id}"
+    validation_query = f"SELECT * FROM personas WHERE id_persona = {id}"
     try:
         val_result = conn.execute(text(validation_query))
         if val_result.rowcount != 0 :
@@ -254,9 +254,9 @@ def delete_clientes(id):
 @app.route('/habitaciones/<id>', methods = ['DELETE'])  
 def delete_habitaciones(id):
     conn = engine.connect()
-    query = f"""DELETE FROM tabla_habitaciones WHERE id_habitacion = {id};"""
+    query = f"""DELETE FROM habitaciones WHERE id_habitacion = {id};"""
             
-    validation_query = f"SELECT * FROM tabla_habitaciones WHERE id_habitacion = {id}"
+    validation_query = f"SELECT * FROM habitaciones WHERE id_habitacion = {id}"
     try:
         val_result = conn.execute(text(validation_query))
         if val_result.rowcount != 0 :
@@ -275,9 +275,9 @@ def delete_habitaciones(id):
 @app.route('/reservas/<id>', methods = ['DELETE'])  
 def delete_reserva(id):
     conn = engine.connect()
-    query = f"""DELETE FROM tabla_reservas WHERE id_reserva = {id};"""
+    query = f"""DELETE FROM reservas WHERE id_reserva = {id};"""
             
-    validation_query = f"SELECT * FROM tabla_reservas WHERE id_reserva = {id}"
+    validation_query = f"SELECT * FROM reservas WHERE id_reserva = {id}"
     try:
         val_result = conn.execute(text(validation_query))
         if val_result.rowcount != 0 :
@@ -301,12 +301,12 @@ def editar_habitacion(id):
     conn = engine.connect()
     datos_habitacion = request.get_json()
     query = f"""
-        UPDATE tabla_habitaciones
+        UPDATE habitaciones
         SET {', '.join([f"{key} = '{value}'" for key, value in datos_habitacion.items()])}
         WHERE id_habitacion = {id};
     """
     
-    validation_query = f"SELECT * FROM tabla_habitaciones WHERE id_habitacion = {id};"
+    validation_query = f"SELECT * FROM habitaciones WHERE id_habitacion = {id};"
     try:
         val_result = conn.execute(text(validation_query))
         if val_result.rowcount != 0:
