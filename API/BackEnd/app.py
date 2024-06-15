@@ -65,6 +65,7 @@ def cargar_reserva():
         cant_noches = (int(salida[1]) - int(entrada[1])) * 30 + int(salida[2]) - int(entrada[2])
     else:
         cant_noches = int(salida[2]) - int(entrada[2])
+    #validar first
     nueva_reserva["total_a_pagar"] = cant_noches * result.first()[0]
 
     query = f"""INSERT INTO reservas (id_habitaciones, id_personas, fecha_inicio, fecha_salida, total_a_pagar) VALUES ('{nueva_reserva["id_habitaciones"]}', '{nueva_reserva["id_personas"]}', '{nueva_reserva["fecha_inicio"]}', '{nueva_reserva["fecha_salida"]}', '{nueva_reserva["total_a_pagar"]}');"""
@@ -401,7 +402,7 @@ def editar_habitacion(id):
         WHERE id_habitacion = {id};
     """
     
-    validation_query = f"SELECT * FROM habitaciones WHERE id_habitacion = {id};"
+    validation_query = "SELECT * FROM habitaciones WHERE id_habitacion = {id};".format(id=id)
     try:
         val_result = conn.execute(text(validation_query))
         if val_result.rowcount != 0:
