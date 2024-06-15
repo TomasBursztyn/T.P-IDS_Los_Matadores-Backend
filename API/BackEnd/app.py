@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 app = Flask(__name__)
-engine = create_engine("mysql+mysqlconnector://root:123@localhost:3308/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
+engine = create_engine("mysql+mysqlconnector://root:123456@localhost:3307/tp_ids_db") #cambiar puerto al de tu base de datos, y nombre despues del /
 
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -265,29 +265,27 @@ def get_clientes_dni(dni):
 @app.route('/reserva_dni/<dni>', methods = ['GET'])
 def get_reserva_por_dni(dni):
     conn = engine.connect()
-    query = f"""
-    SELECT reservas.*
+    query = f"""SELECT reservas.*
     FROM reservas
-    JOIN personas ON reservas.id_persona = personas.id_persona
-    WHERE personas.dni = {dni};
+    JOIN personas ON reservas.id_personas = personas.id_persona
+    WHERE personas.dni_persona = {dni};
     """
     try:
         result = conn.execute(text(query))
-        conn.commit()
         conn.close()
         if result.rowcount != 0 :
             data = []
             for row in result:
                 entity = {}
-                entity['id_reserva'] = row[4]
-                entity['id_habitaciones'] = row[3]
-                entity['id_personas'] = row[2]
-                entity['fecha_inicio'] = row[0]
-                entity['fecha_salida'] = row[1]
-                #entity['total_a_pagar'] = row.total_a_pagar
+                entity['id_reserva'] = row.id_reserva
+                entity['id_habitaciones'] = row.id_habitaciones
+                entity['id_personas'] = row.id_personas
+                entity['fecha_inicio'] = row.fecha_inicio
+                entity['fecha_salida'] = row.fecha_salida
+                entity['total_a_pagar'] = row.total_a_pagar
 
                 data.append(entity)
-            return data, 200
+            return jsonify(data), 200
 
         else:
             conn.close()
