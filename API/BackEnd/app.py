@@ -289,7 +289,7 @@ def get_reserva_por_dni(dni):
 
         else:
             conn.close()
-            return None
+            return []
     except SQLAlchemyError as err:
         return str(err.__cause__)
 
