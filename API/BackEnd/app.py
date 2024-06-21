@@ -5,7 +5,9 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 app = Flask(__name__)
-engine = create_engine("mysql+mysqlconnector://root:123@localhost:3306/TP_IDS") #cambiar puerto al de tu base de datos, y nombre despues del /
+DB_PORT = "3306" 
+DB_NAME = "TP_IDS"
+engine = create_engine(f"mysql+mysqlconnector://root:123@localhost:{DB_PORT}/{DB_NAME}") #cambiar puerto al de tu base de datos, y nombre despues del /
 
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------
