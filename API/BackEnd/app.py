@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy #habria que sacar esto si no se usa
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -13,6 +13,7 @@ engine = create_engine("mysql+mysqlconnector://root:123@localhost:3306/TP_IDS") 
 # Endpoints:
 
 # Endpoints POST para introducir valores en las tablas:
+
 # POST habitacion
 @app.route('/cargar_habitacion', methods = ['POST'])
 def cargar_habitacion():
@@ -47,7 +48,7 @@ def cargar_cliente():
     
     return jsonify({'message': 'se ha agregado correctamente' + query}), 201
 
-#POST reserva
+# POST reserva
 @app.route('/cargar_reserva', methods = ['POST'])
 def cargar_reserva():
     conn = engine.connect()
@@ -80,6 +81,7 @@ def cargar_reserva():
 
 
 # Endpoints GET para recibir todo lo que contienen las tablas:
+
 # GET habitaciones
 @app.route('/mostrar_habitaciones', methods = ['GET'])
 def get_habitaciones():
@@ -156,9 +158,9 @@ def get_reservas():
 
     return jsonify(data), 200
 
-# Endpoint GET par abuscar por fechas
-#GET fechas reservas
+# Endpoint GET para buscar por fechas
 
+# GET fechas reservas
 @app.route('/mostrar_reservas/<fecha_inicio>/<fecha_fin>', methods = ['GET'])
 def get_reservas_por_fechas(fecha_inicio, fecha_fin):
     conn = engine.connect()
@@ -187,7 +189,8 @@ def get_reservas_por_fechas(fecha_inicio, fecha_fin):
 
 
 # Endpoints GET para buscar por id
-#GET id habitacion
+
+# GET id habitacion
 @app.route('/habitacion/<id>', methods = ['GET'])
 def get_habitacion(id):
     conn = engine.connect()
@@ -322,6 +325,7 @@ def get_reservas_id(id):
 
 
 # Endpoints DELETE
+
 # Delete de clientes(personas)
 @app.route('/clientes/<id>', methods = ['DELETE'])  
 def delete_clientes(id):
@@ -388,8 +392,8 @@ def delete_reserva(id):
 
 
 # Endpoints PATCH
-# Editar habitacion
 
+# Editar habitacion
 @app.route('/editar_habitacion/<id>', methods = ['PATCH'])
 def editar_habitacion(id):
     conn = engine.connect()

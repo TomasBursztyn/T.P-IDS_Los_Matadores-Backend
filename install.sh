@@ -1,12 +1,12 @@
 # instrucciones para correr el front (un boceto inicial)
 
-FRONT_FOLDER=./Front
+FOLDER=./API/BackEnd
 
 # instala pipenv por si acaso
 pip install pipenv --user
 
 # se mueve a la carpeta front
-cd FRONT_FOLDER
+cd FOLDER
 
 # instalo las dependencias del proyecto administrado por pipenv
 pipenv install
