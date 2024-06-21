@@ -39,21 +39,22 @@ CREATE TABLE `habitaciones` (
 --
 
 INSERT INTO `habitaciones` (`id_habitacion`, `tipo_habitacion`, `precio_por_noche`, `cantidad_personas`) VALUES
-(2, 'standard', 40, 4),
-(3, 'standard', 40, 4),
-(4, 'standard', 40, 4),
-(5, 'standard', 40, 4),
-(6, 'standard', 40, 4),
-(7, 'suite premium', 70, 6),
-(8, 'suite premium', 70, 6),
-(9, 'suite premium', 70, 6),
-(10, 'suite premium', 70, 6),
-(11, 'suite premium', 70, 6),
-(12, 'suite flotante', 100, 2),
-(13, 'suite flotante', 100, 2),
-(14, 'suite flotante', 100, 2),
-(15, 'suite flotante', 100, 2),
-(16, 'suite flotante', 100, 2);
+(2, 'suite flotante', 100, 2),
+(3, 'suite flotante', 100, 2),
+(4, 'suite flotante', 100, 2),
+(5, 'suite flotante', 100, 2),
+(6, 'suite flotante', 100, 2),
+(7, 'standard', 40, 4),
+(8, 'standard', 40, 4),
+(9, 'standard', 40, 4),
+(10, 'standard', 40, 4),
+(11, 'standard', 40, 4),
+(12, 'suite premium', 70, 6),
+(13, 'suite premium', 70, 6),
+(14, 'suite premium', 70, 6),
+(15, 'suite premium', 70, 6),
+(16, 'suite premium', 70, 6);
+
 
 -- --------------------------------------------------------
 
