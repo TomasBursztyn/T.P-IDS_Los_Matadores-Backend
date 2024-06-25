@@ -40,7 +40,7 @@ CREATE TABLE `habitaciones` (
 CREATE TABLE `personas` (
   `id_persona` int(5) NOT NULL,
   `nombre_persona` varchar(50) NOT NULL,
-  `telefono_persona` int(15) NOT NULL,
+  `telefono_persona` varchar(15) NOT NULL,
   `email_persona` varchar(50) NOT NULL,
   `dni_persona` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

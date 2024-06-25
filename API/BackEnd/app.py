@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 app = Flask(__name__)
 
-DB_PORT = "3306"
+DB_PORT = "3308"
 DB_NAME = "TP_IDS"
 BACKEND_PORT = 4000
 engine = create_engine(f"mysql+mysqlconnector://root:123@localhost:{DB_PORT}/{DB_NAME}")
@@ -206,10 +206,10 @@ def get_reservas():
 
 
 # GET fechas reservas
-@app.route("/mostrar_reservas/<fecha_inicio>/<fecha_fin>", methods=["GET"])
-def get_reservas_por_fechas(fecha_inicio, fecha_fin):
+@app.route("/mostrar_habitaciones_disponibles/<fecha_inicio>/<fecha_fin>/<cantidad_personas>", methods=["GET"])
+def get_habitaciones_disponibles(fecha_inicio, fecha_fin, cantidad_personas):
     conn = engine.connect()
-    query = f"""SELECT * FROM reservas WHERE fecha_inicio >= '{fecha_inicio}' AND fecha_salida <= '{fecha_fin}';"""
+    query = f"""SELECT * FROM habitaciones WHERE cantidad_personas >= {cantidad_personas} AND id_habitacion NOT IN (SELECT id_habitaciones FROM reservas WHERE fecha_inicio <= '{fecha_fin}' AND fecha_salida >= '{fecha_inicio}');"""
 
     try:
         result = conn.execute(text(query))
@@ -224,12 +224,10 @@ def get_reservas_por_fechas(fecha_inicio, fecha_fin):
     data = []
     for row in result:
         entity = {}
-        entity["id_reserva"] = row.id_reserva
-        entity["id_habitaciones"] = row.id_habitaciones
-        entity["id_personas"] = row.id_personas
-        entity["fecha_inicio"] = row.fecha_inicio
-        entity["fecha_salida"] = row.fecha_salida
-        entity["total_a_pagar"] = row.total_a_pagar
+        entity["id_habitacion"] = row.id_habitacion
+        entity["tipo_habitacion"] = row.tipo_habitacion
+        entity["precio_por_noche"] = row.precio_por_noche
+        entity["cantidad_personas"] = row.cantidad_personas
 
         data.append(entity)
 
