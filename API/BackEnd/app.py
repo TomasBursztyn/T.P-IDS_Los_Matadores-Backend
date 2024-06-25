@@ -10,14 +10,8 @@ DB_NAME = "TP_IDS"
 BACKEND_PORT = 4000
 engine = create_engine(f"mysql+mysqlconnector://root:123@localhost:{DB_PORT}/{DB_NAME}")
 
-# -------------------------------------------------------------------------------
 
-# Endpoints:
-
-# Endpoints POST para introducir valores en las tablas:
-
-
-# POST habitacion
+# POST cargar_habitacion
 @app.route("/cargar_habitacion", methods=["POST"])
 def cargar_habitacion():
     conn = engine.connect()
@@ -34,14 +28,14 @@ def cargar_habitacion():
         conn.close()
     except SQLAlchemyError as err:
         return (
-            jsonify({"message": "Se ha producido un error" + str(err.__cause__)}),
+            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
             500,
         )
 
     return jsonify({"message": "Se ha agregado correctamente" + query}), 201
 
 
-# POST cliente
+# POST cargar_clientes
 @app.route("/cargar_clientes", methods=["POST"])
 def cargar_cliente():
     conn = engine.connect()
@@ -54,14 +48,14 @@ def cargar_cliente():
         conn.close()
     except SQLAlchemyError as err:
         return (
-            jsonify({"message": "Se ha producido un error" + str(err.__cause__)}),
+            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
             500,
         )
 
     return jsonify({"message": "Se ha agregado correctamente" + query}), 201
 
 
-# POST reserva
+# POST cargar_reserva
 @app.route("/cargar_reserva", methods=["POST"])
 def cargar_reserva():
     conn = engine.connect()
@@ -75,7 +69,7 @@ def cargar_reserva():
         result = conn.execute(text(query))
     except SQLAlchemyError as err:
         return (
-            jsonify({"message": "Se ha producido un error" + str(err.__cause__)}),
+            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
             500,
         )
 
@@ -104,17 +98,14 @@ def cargar_reserva():
         conn.close()
     except SQLAlchemyError as err:
         return (
-            jsonify({"message": "Se ha producido un error" + str(err.__cause__)}),
+            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
             500,
         )
 
     return jsonify({"message": "Se ha agregado correctamente" + query}), 201
 
 
-# Endpoints GET para recibir todo lo que contienen las tablas:
-
-
-# GET habitaciones
+# GET mostrar_habitaciones
 @app.route("/mostrar_habitaciones", methods=["GET"])
 def get_habitaciones():
     conn = engine.connect()
@@ -125,7 +116,7 @@ def get_habitaciones():
         conn.close()
     except SQLAlchemyError as err:
         return (
-            jsonify({"message": "Se ha producido un error" + str(err.__cause__)}),
+            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
             500,
         )
 
@@ -137,13 +128,13 @@ def get_habitaciones():
         entity["tipo_habitacion"] = row.tipo_habitacion
         entity["precio_por_noche"] = row.precio_por_noche
         entity["cantidad_personas"] = row.cantidad_personas
-        
+
         data.append(entity)
 
     return jsonify(data), 200
 
 
-# GET clientes
+# GET mostrar_clientes
 @app.route("/mostrar_clientes", methods=["GET"])
 def get_clientes():
     conn = engine.connect()
@@ -154,7 +145,7 @@ def get_clientes():
         conn.close()
     except SQLAlchemyError as err:
         return (
-            jsonify({"message": "Se ha producido un error" + str(err.__cause__)}),
+            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
             500,
         )
 
@@ -172,7 +163,7 @@ def get_clientes():
     return jsonify(data), 200
 
 
-# GET reservas
+# GET mostrar_reservas
 @app.route("/mostrar_reservas", methods=["GET"])
 def get_reservas():
     conn = engine.connect()
@@ -183,7 +174,7 @@ def get_reservas():
         conn.close()
     except SQLAlchemyError as err:
         return (
-            jsonify({"message": "Se ha producido un error" + str(err.__cause__)}),
+            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
             500,
         )
 
@@ -202,11 +193,11 @@ def get_reservas():
     return jsonify(data), 200
 
 
-# Endpoint GET para buscar por fechas
-
-
-# GET fechas reservas
-@app.route("/mostrar_habitaciones_disponibles/<fecha_inicio>/<fecha_fin>/<cantidad_personas>", methods=["GET"])
+# GET mostrar_habitaciones_disponibles por fechas de inicio y fin y cantidad de personas
+@app.route(
+    "/mostrar_habitaciones_disponibles/<fecha_inicio>/<fecha_fin>/<cantidad_personas>",
+    methods=["GET"],
+)
 def get_habitaciones_disponibles(fecha_inicio, fecha_fin, cantidad_personas):
     conn = engine.connect()
     query = f"""SELECT * FROM habitaciones WHERE cantidad_personas >= {cantidad_personas} AND id_habitacion NOT IN (SELECT id_habitaciones FROM reservas WHERE fecha_inicio <= '{fecha_fin}' AND fecha_salida >= '{fecha_inicio}');"""
@@ -217,7 +208,7 @@ def get_habitaciones_disponibles(fecha_inicio, fecha_fin, cantidad_personas):
         conn.close()
     except SQLAlchemyError as err:
         return (
-            jsonify({"message": "Se ha producido un error" + str(err.__cause__)}),
+            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
             500,
         )
 
@@ -234,10 +225,7 @@ def get_habitaciones_disponibles(fecha_inicio, fecha_fin, cantidad_personas):
     return jsonify(data), 200
 
 
-# Endpoints GET para buscar por id
-
-
-# GET id habitacion
+# GET habitacion por id
 @app.route("/habitacion/<id>", methods=["GET"])
 def get_habitacion(id):
     conn = engine.connect()
@@ -249,7 +237,7 @@ def get_habitacion(id):
         conn.close()
     except SQLAlchemyError as err:
         return (
-            jsonify({"message": "Se ha producido un error" + str(err.__cause__)}),
+            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
             500,
         )
 
@@ -262,10 +250,10 @@ def get_habitacion(id):
         data["cantidad_personas"] = row[3]
         return jsonify(data), 200
 
-    return jsonify({"message": "La habitación no existe"}), 404
+    return jsonify({"message": f"La habitación con id {id} no existe"}), 404
 
 
-# GET id clientes
+# GET clientes por id
 @app.route("/clientes/<id>", methods=["GET"])
 def get_clientes_id(id):
     conn = engine.connect()
@@ -277,7 +265,7 @@ def get_clientes_id(id):
         conn.close()
     except SQLAlchemyError as err:
         return (
-            jsonify({"message": "Se ha producido un error" + str(err.__cause__)}),
+            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
             500,
         )
 
@@ -291,10 +279,10 @@ def get_clientes_id(id):
         data["dni_persona"] = row[4]
         return jsonify(data), 200
 
-    return jsonify({"message": "El usuario no existe"}), 404
+    return jsonify({"message": f"El usuario con id {id} no existe"}), 404
 
 
-# GET dni clientes
+# GET clientes_dni por dni
 @app.route("/clientes_dni/<dni>", methods=["GET"])
 def get_clientes_dni(dni):
     conn = engine.connect()
@@ -306,7 +294,7 @@ def get_clientes_dni(dni):
         conn.close()
     except SQLAlchemyError as err:
         return (
-            jsonify({"message": "Se ha producido un error" + str(err.__cause__)}),
+            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
             500,
         )
 
@@ -320,18 +308,18 @@ def get_clientes_dni(dni):
         data["dni_persona"] = row[4]
         return jsonify(data), 200
 
-    return jsonify({"message": "El usuario no existe"}), 404
+    return jsonify({"message": f"El usuario con id {id} no existe"}), 404
 
 
-# GET reserva por dni_persona
+# GET reserva_dni por DNI
 @app.route("/reserva_dni/<dni>", methods=["GET"])
 def get_reserva_por_dni(dni):
     conn = engine.connect()
     query = f"""SELECT reservas.*
     FROM reservas
     JOIN personas ON reservas.id_personas = personas.id_persona
-    WHERE personas.dni_persona = {dni};
-    """
+    WHERE personas.dni_persona = {dni};"""
+
     try:
         result = conn.execute(text(query))
         conn.close()
@@ -345,10 +333,8 @@ def get_reserva_por_dni(dni):
                 entity["fecha_inicio"] = row.fecha_inicio
                 entity["fecha_salida"] = row.fecha_salida
                 entity["total_a_pagar"] = row.total_a_pagar
-
                 data.append(entity)
             return jsonify(data), 200
-
         else:
             conn.close()
             return []
@@ -356,7 +342,7 @@ def get_reserva_por_dni(dni):
         return str(err.__cause__)
 
 
-# GET id reservas
+# GET mostrar_reservas por id
 @app.route("/mostrar_reservas/<id>", methods=["GET"])
 def get_reservas_id(id):
     conn = engine.connect()
@@ -368,7 +354,7 @@ def get_reservas_id(id):
         conn.close()
     except SQLAlchemyError as err:
         return (
-            jsonify({"message": "Se ha producido un error" + str(err.__cause__)}),
+            jsonify({"message": f"Se ha producido un error {str(err.__cause__)}"}),
             500,
         )
 
@@ -383,120 +369,129 @@ def get_reservas_id(id):
         data["total_a_pagar"] = row[5]
         return jsonify(data), 200
 
-    return jsonify({"message": "La reserva no existe"}), 404
+    return jsonify({"message": f"La reserva con id {id} no existe"}), 404
 
 
-# Endpoints DELETE
-
-
-# Delete de clientes(personas)
+# DELETET clientes por id
 @app.route("/clientes/<id>", methods=["DELETE"])
 def delete_clientes(id):
     conn = engine.connect()
-    query = f"""DELETE FROM personas WHERE id_persona = {id};"""
-
+    query = f"DELETE FROM personas WHERE id_persona = {id};"
     validation_query = f"SELECT * FROM personas WHERE id_persona = {id}"
+
     try:
-        val_result = conn.execute(text(validation_query))
-        if val_result.rowcount != 0:
+        validation_result = conn.execute(text(validation_query))
+        if validation_result.rowcount != 0:
             conn.execute(text(query))
             conn.commit()
             conn.close()
         else:
             conn.close()
-            return jsonify({"message": "El usuario no existe"}), 404
+            return jsonify({"message": f"El usuario con id {id} no existe"}), 404
     except SQLAlchemyError as err:
         return (
-            jsonify({"message": "Se ha producido un error" + str(err.__cause__)}),
+            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
             500,
         )
 
-    return jsonify({"message": "Se ha eliminado correctamente"}), 202
+    return (
+        jsonify({"message": f"Se ha eliminado correctamente al cliente con id {id}"}),
+        202,
+    )
 
 
-# Endpoint DELETE para eliminar una habitacion de la tabla_habitaciones por medio del id_habitacion
+# DELETE habitaciones por id_habitacion
 @app.route("/habitaciones/<id>", methods=["DELETE"])
 def delete_habitaciones(id):
     conn = engine.connect()
-    query = f"""DELETE FROM habitaciones WHERE id_habitacion = {id};"""
-
+    query = f"DELETE FROM habitaciones WHERE id_habitacion = {id};"
     validation_query = f"SELECT * FROM habitaciones WHERE id_habitacion = {id}"
+
     try:
-        val_result = conn.execute(text(validation_query))
-        if val_result.rowcount != 0:
+        validation_result = conn.execute(text(validation_query))
+        if validation_result.rowcount != 0:
             conn.execute(text(query))
             conn.commit()
             conn.close()
         else:
             conn.close()
-            return jsonify({"message": "La habitacion no existe"}), 404
+            return jsonify({"message": f"La habitacion con id {id} no existe"}), 404
     except SQLAlchemyError as err:
         return (
-            jsonify({"message": "Se ha producido un error" + str(err.__cause__)}),
+            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
             500,
         )
 
-    return jsonify({"message": "Se ha eliminado correctamente"}), 202
+    return (
+        jsonify(
+            {"message": f"Se ha eliminado correctamente a la habitacion con id {id}"}
+        ),
+        202,
+    )
 
 
-# Borrar reserva
+# DELETE reservas por id_reserva
 @app.route("/reservas/<id>", methods=["DELETE"])
 def delete_reserva(id):
     conn = engine.connect()
-    query = f"""DELETE FROM reservas WHERE id_reserva = {id};"""
-
+    query = f"DELETE FROM reservas WHERE id_reserva = {id};"
     validation_query = f"SELECT * FROM reservas WHERE id_reserva = {id}"
+
     try:
-        val_result = conn.execute(text(validation_query))
-        if val_result.rowcount != 0:
+        validation_result = conn.execute(text(validation_query))
+        if validation_result.rowcount != 0:
             conn.execute(text(query))
             conn.commit()
             conn.close()
         else:
             conn.close()
-            return jsonify({"message": "La reserva no existe"}), 404
+            return jsonify({"message": f"La reserva con id {id} no existe"}), 404
     except SQLAlchemyError as err:
         return (
-            jsonify({"message": "Se ha producido un error" + str(err.__cause__)}),
+            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
             500,
         )
 
-    return jsonify({"message": "Se ha eliminado correctamente"}), 202
+    return (
+        jsonify({"message": f"Se ha eliminado correctamente a la reserva con id {id}"}),
+        202,
+    )
 
 
-# Endpoints PATCH
-
-
-# Editar habitacion
+# PATCH editar_habitacion por id_habitacion
 @app.route("/editar_habitacion/<id>", methods=["PATCH"])
 def editar_habitacion(id):
     conn = engine.connect()
     datos_habitacion = request.get_json()
-    query = f"""
+    update_query = f"""
         UPDATE habitaciones
         SET {', '.join([f"{key} = '{value}'" for key, value in datos_habitacion.items()])}
         WHERE id_habitacion = {id};
     """
+    validation_query = f"SELECT * FROM habitaciones WHERE id_habitacion = {id};"
 
-    validation_query = "SELECT * FROM habitaciones WHERE id_habitacion = {id};".format(
-        id=id
-    )
+    # Validamos que exista la habitacion antes de modificarla
     try:
-        val_result = conn.execute(text(validation_query))
-        if val_result.rowcount != 0:
-            conn.execute(text(query))
+        validation_result = conn.execute(text(validation_query))
+        if validation_result.rowcount != 0:
+            conn.execute(text(update_query))
             conn.commit()
             conn.close()
         else:
             conn.close()
-            return jsonify({"message": "La habitación no existe"}), 404
+            return jsonify({"message": f"La habitación con id {id} no existe"}), 404
     except SQLAlchemyError as err:
         return (
-            jsonify({"message": "Se ha producido un error: " + str(err.__cause__)}),
+            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
             500,
         )
 
-    return jsonify({"message": "Se ha modificado correctamente"}), 200
+    return (
+        jsonify(
+            {"message": f"Se ha modificado correctamente a la habitacion con id {id}"}
+        ),
+        200,
+    )
 
 
 if __name__ == "__main__":
