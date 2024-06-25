@@ -32,7 +32,7 @@ def cargar_habitacion():
             500,
         )
 
-    return jsonify({"message": "Se ha agregado correctamente" + query}), 201
+    return jsonify({"message": "Se ha agregado correctamente a la habitacion"}), 201
 
 
 # POST cargar_clientes
@@ -52,7 +52,7 @@ def cargar_cliente():
             500,
         )
 
-    return jsonify({"message": "Se ha agregado correctamente" + query}), 201
+    return jsonify({"message": "Se ha agregado correctamente al cliente"}), 201
 
 
 # POST cargar_reserva
@@ -210,18 +210,21 @@ def get_habitaciones_disponibles(fecha_inicio, fecha_fin, cantidad_personas):
             jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
             500,
         )
+    
+    if result.rowcount != 0:
+        data = []
+        for row in result:
+            entity = {}
+            entity["id_habitacion"] = row.id_habitacion
+            entity["tipo_habitacion"] = row.tipo_habitacion
+            entity["precio_por_noche"] = row.precio_por_noche
+            entity["cantidad_personas"] = row.cantidad_personas
 
-    data = []
-    for row in result:
-        entity = {}
-        entity["id_habitacion"] = row.id_habitacion
-        entity["tipo_habitacion"] = row.tipo_habitacion
-        entity["precio_por_noche"] = row.precio_por_noche
-        entity["cantidad_personas"] = row.cantidad_personas
+            data.append(entity)
 
-        data.append(entity)
-
-    return jsonify(data), 200
+        return jsonify(data), 200
+    
+    return []
 
 
 # GET habitacion por id
