@@ -204,7 +204,6 @@ def get_habitaciones_disponibles(fecha_inicio, fecha_fin, cantidad_personas):
 
     try:
         result = conn.execute(text(query))
-        conn.commit()
         conn.close()
     except SQLAlchemyError as err:
         return (
@@ -233,7 +232,6 @@ def get_habitacion(id):
 
     try:
         result = conn.execute(text(query))
-        conn.commit()
         conn.close()
     except SQLAlchemyError as err:
         return (
@@ -261,7 +259,6 @@ def get_clientes_id(id):
 
     try:
         result = conn.execute(text(query))
-        conn.commit()
         conn.close()
     except SQLAlchemyError as err:
         return (
@@ -290,7 +287,6 @@ def get_clientes_dni(dni):
 
     try:
         result = conn.execute(text(query))
-        conn.commit()
         conn.close()
     except SQLAlchemyError as err:
         return (
@@ -323,23 +319,26 @@ def get_reserva_por_dni(dni):
     try:
         result = conn.execute(text(query))
         conn.close()
-        if result.rowcount != 0:
-            data = []
-            for row in result:
-                entity = {}
-                entity["id_reserva"] = row.id_reserva
-                entity["id_habitaciones"] = row.id_habitaciones
-                entity["id_personas"] = row.id_personas
-                entity["fecha_inicio"] = row.fecha_inicio
-                entity["fecha_salida"] = row.fecha_salida
-                entity["total_a_pagar"] = row.total_a_pagar
-                data.append(entity)
-            return jsonify(data), 200
-        else:
-            conn.close()
-            return []
     except SQLAlchemyError as err:
-        return str(err.__cause__)
+        return (
+            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
+            500,
+        )
+
+    if result.rowcount != 0:
+        data = []
+        for row in result:
+            entity = {}
+            entity["id_reserva"] = row.id_reserva
+            entity["id_habitaciones"] = row.id_habitaciones
+            entity["id_personas"] = row.id_personas
+            entity["fecha_inicio"] = row.fecha_inicio
+            entity["fecha_salida"] = row.fecha_salida
+            entity["total_a_pagar"] = row.total_a_pagar
+            data.append(entity)
+        return jsonify(data), 200
+
+    return []
 
 
 # GET mostrar_reservas por id
@@ -350,7 +349,6 @@ def get_reservas_id(id):
 
     try:
         result = conn.execute(text(query))
-        conn.commit()
         conn.close()
     except SQLAlchemyError as err:
         return (
