@@ -1,4 +1,5 @@
-# instrucciones para correr el front (un boceto inicial)
+# instrucciones para correr el backend
+# se espera que esto sea abierto en una terminal en la misma carpeta que install.sh
 
 FOLDER=./API/BackEnd
 BACKEND_PORT=4000
@@ -19,6 +20,7 @@ pipenv install
 pipenv shell
 
 # esto hay que pegarlo manualmente porque "pipenv shell" crea una sub shell
-# corro el front con el --debug activado para actualizar los cambios
-# ojo esto solo para desarrollo (no meter en produccion con --debug activado)
+# con el --debug activado para actualizar los cambios
+# con el -p ponemos el port manualmente
+# esto es para correr el backend en desarrollo
 pipenv run flask run --debug -p $BACKEND_PORT
