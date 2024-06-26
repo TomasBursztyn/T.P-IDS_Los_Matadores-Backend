@@ -35,8 +35,9 @@ def cargar_habitacion():
         conn.commit()
         conn.close()
     except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un INSERT en cargar_habitacion: {str(err.__cause__)}"
         return (
-            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
+            jsonify({"message": message}),
             500,
         )
 
@@ -55,8 +56,9 @@ def cargar_cliente():
         conn.commit()
         conn.close()
     except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un INSERT en cargar_cliente: {str(err.__cause__)}"
         return (
-            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
+            jsonify({"message": message}),
             500,
         )
 
@@ -76,8 +78,9 @@ def cargar_reserva():
     try:
         result = conn.execute(text(QUERY))
     except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un SELECT en cargar_reserva: {str(err.__cause__)}"
         return (
-            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
+            jsonify({"message": message}),
             500,
         )
 
@@ -105,8 +108,9 @@ def cargar_reserva():
         conn.commit()
         conn.close()
     except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un INSERT en cargar_reserva: {str(err.__cause__)}"
         return (
-            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
+            jsonify({"message": message}),
             500,
         )
 
@@ -123,8 +127,9 @@ def get_habitaciones():
         result = conn.execute(text(QUERY))
         conn.close()
     except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un SELECT en get_habitaciones: {str(err.__cause__)}"
         return (
-            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
+            jsonify({"message": message}),
             500,
         )
 
@@ -152,8 +157,9 @@ def get_clientes():
         result = conn.execute(text(QUERY))
         conn.close()
     except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un SELECT en get_clientes: {str(err.__cause__)}"
         return (
-            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
+            jsonify({"message": message}),
             500,
         )
 
@@ -181,8 +187,9 @@ def get_reservas():
         result = conn.execute(text(QUERY))
         conn.close()
     except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un SELECT en get_reservas: {str(err.__cause__)}"
         return (
-            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
+            jsonify({"message": message}),
             500,
         )
 
@@ -214,8 +221,9 @@ def get_habitaciones_disponibles(fecha_inicio, fecha_fin, cantidad_personas):
         result = conn.execute(text(QUERY))
         conn.close()
     except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un SELECT en get_habitaciones_disponibles: {str(err.__cause__)}"
         return (
-            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
+            jsonify({"message": message}),
             500,
         )
 
@@ -245,8 +253,9 @@ def get_habitacion(id):
         result = conn.execute(text(QUERY))
         conn.close()
     except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un SELECT en get_habitacion: {str(err.__cause__)}"
         return (
-            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
+            jsonify({"message": message}),
             500,
         )
 
@@ -272,8 +281,9 @@ def get_clientes_id(id):
         result = conn.execute(text(QUERY))
         conn.close()
     except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un SELECT en get_clientes_id: {str(err.__cause__)}"
         return (
-            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
+            jsonify({"message": message}),
             500,
         )
 
@@ -300,8 +310,9 @@ def get_clientes_dni(dni):
         result = conn.execute(text(QUERY))
         conn.close()
     except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un SELECT en get_clientes_dni: {str(err.__cause__)}"
         return (
-            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
+            jsonify({"message": message}),
             500,
         )
 
@@ -328,8 +339,9 @@ def get_reserva_por_dni(dni):
         result = conn.execute(text(QUERY))
         conn.close()
     except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un SELECT en get_reserva_por_dni: {str(err.__cause__)}"
         return (
-            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
+            jsonify({"message": message}),
             500,
         )
 
@@ -359,8 +371,9 @@ def get_reservas_id(id):
         result = conn.execute(text(QUERY))
         conn.close()
     except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un SELECT en get_reservas_id: {str(err.__cause__)}"
         return (
-            jsonify({"message": f"Se ha producido un error {str(err.__cause__)}"}),
+            jsonify({"message": message}),
             500,
         )
 
@@ -378,25 +391,36 @@ def get_reservas_id(id):
     return jsonify({"message": f"La reserva con id {id} no existe"}), 404
 
 
-# DELETET clientes por id
+# DELETE clientes por id
 @app.route("/clientes/<id>", methods=["DELETE"])
 def delete_clientes(id):
     conn = engine.connect()
     QUERY = f"SELECT * FROM personas WHERE id_persona = {id}"
 
+    # Validamos que exista el cliente antes de borrarlo
     try:
         validation_result = conn.execute(text(QUERY))
-        if validation_result.rowcount != 0:
-            QUERY = f"DELETE FROM personas WHERE id_persona = {id};"
-            conn.execute(text(QUERY))
-            conn.commit()
-            conn.close()
-        else:
-            conn.close()
-            return jsonify({"message": f"El usuario con id {id} no existe"}), 404
     except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un SELECT en delete_clientes: {str(err.__cause__)}"
         return (
-            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
+            jsonify({"message": message}),
+            500,
+        )
+
+    # Si no existe el cliente devolvemos un mensaje con codigo 404
+    if validation_result.rowcount == 0:
+        conn.close()
+        return jsonify({"message": f"El usuario con id {id} no existe"}), 404
+
+    try:
+        QUERY = f"DELETE FROM personas WHERE id_persona = {id};"
+        conn.execute(text(QUERY))
+        conn.commit()
+        conn.close()
+    except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un DELETE en cargar_reserva: {str(err.__cause__)}"
+        return (
+            jsonify({"message": message}),
             500,
         )
 
@@ -412,19 +436,30 @@ def delete_habitaciones(id):
     conn = engine.connect()
     QUERY = f"SELECT * FROM habitaciones WHERE id_habitacion = {id}"
 
+    # Validamos que exista la habitacion antes de borrarla
     try:
         validation_result = conn.execute(text(QUERY))
-        if validation_result.rowcount != 0:
-            QUERY = f"DELETE FROM habitaciones WHERE id_habitacion = {id};"
-            conn.execute(text(QUERY))
-            conn.commit()
-            conn.close()
-        else:
-            conn.close()
-            return jsonify({"message": f"La habitacion con id {id} no existe"}), 404
     except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un SELECT en delete_habitaciones: {str(err.__cause__)}"
         return (
-            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
+            jsonify({"message": message}),
+            500,
+        )
+
+    # Si no existe la habitacion devolvemos un mensaje con codigo 404
+    if validation_result.rowcount == 0:
+        conn.close()
+        return jsonify({"message": f"La habitacion con id {id} no existe"}), 404
+
+    try:
+        QUERY = f"DELETE FROM habitaciones WHERE id_habitacion = {id};"
+        conn.execute(text(QUERY))
+        conn.commit()
+        conn.close()
+    except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un DELETE en delete_habitaciones: {str(err.__cause__)}"
+        return (
+            jsonify({"message": message}),
             500,
         )
 
@@ -442,19 +477,30 @@ def delete_reserva(id):
     conn = engine.connect()
     QUERY = f"SELECT * FROM reservas WHERE id_reserva = {id}"
 
+    # Validamos que exista la reserva antes de borrarla
     try:
         validation_result = conn.execute(text(QUERY))
-        if validation_result.rowcount != 0:
-            QUERY = f"DELETE FROM reservas WHERE id_reserva = {id};"
-            conn.execute(text(QUERY))
-            conn.commit()
-            conn.close()
-        else:
-            conn.close()
-            return jsonify({"message": f"La reserva con id {id} no existe"}), 404
     except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un SELECT en delete_reserva: {str(err.__cause__)}"
         return (
-            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
+            jsonify({"message": message}),
+            500,
+        )
+
+    # Si no existe la reserva devolvemos un mensaje con codigo 404
+    if validation_result.rowcount == 0:
+        conn.close()
+        return jsonify({"message": f"La reserva con id {id} no existe"}), 404
+
+    try:
+        QUERY = f"DELETE FROM reservas WHERE id_reserva = {id};"
+        conn.execute(text(QUERY))
+        conn.commit()
+        conn.close()
+    except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un DELETE en delete_reserva: {str(err.__cause__)}"
+        return (
+            jsonify({"message": message}),
             500,
         )
 
@@ -474,17 +520,27 @@ def editar_habitacion(id):
     # Validamos que exista la habitacion antes de modificarla
     try:
         validation_result = conn.execute(text(QUERY))
-        if validation_result.rowcount != 0:
-            QUERY = f"""UPDATE habitaciones SET {', '.join([f"{key} = '{value}'" for key, value in datos_habitacion.items()])} WHERE id_habitacion = {id};"""
-            conn.execute(text(QUERY))
-            conn.commit()
-            conn.close()
-        else:
-            conn.close()
-            return jsonify({"message": f"La habitación con id {id} no existe"}), 404
     except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un SELECT en editar_habitacion: {str(err.__cause__)}"
         return (
-            jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
+            jsonify({"message": message}),
+            500,
+        )
+
+    # Si no existe la habitacion devolvemos un mensaje con codigo 404
+    if validation_result.rowcount == 0:
+        conn.close()
+        return jsonify({"message": f"La habitación con id {id} no existe"}), 404
+
+    try:
+        QUERY = f"""UPDATE habitaciones SET {', '.join([f"{key} = '{value}'" for key, value in datos_habitacion.items()])} WHERE id_habitacion = {id};"""
+        conn.execute(text(QUERY))
+        conn.commit()
+        conn.close()
+    except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un UPDATE en editar_habitacion: {str(err.__cause__)}"
+        return (
+            jsonify({"message": message}),
             500,
         )
 
