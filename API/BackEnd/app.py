@@ -5,18 +5,27 @@ from sqlalchemy.exc import SQLAlchemyError
 
 app = Flask(__name__)
 
+# Constante QUERY que se utiliza a lo largo de la aplicacion
 QUERY = ""
+# Constante BACKEND_PORT que lo utiliza Flask para correr la aplicacion
 BACKEND_PORT = 4000
+# Constantes que necesita pythonanywhere que utilice sqlalchemy para poder conectarse bien
+# Se hizo con la ayuda de la documentacion:
+# https://help.pythonanywhere.com/pages/UsingSQLAlchemywithMySQL
+# Hace falta especificar el parametro pool_recycle, en la documentacion se explica
 USERNAME = "LOS1MATADORESAPI"
 PASSWORD = "databasecontra123#"
 HOSTNAME = "LOS1MATADORESAPI.mysql.pythonanywhere-services.com"
 DB_NAME = "LOS1MATADORESAPI$default"
-# DB_PORT = "3308"
-# desarrollo: f"mysql+mysqlconnector://root:123@localhost:{DB_PORT}/{DB_NAME}"
-# https://help.pythonanywhere.com/pages/UsingSQLAlchemywithMySQL
+# Este seria el engine que se utilizaria en produccion
 engine = create_engine(
     f"mysql+mysqldb://{USERNAME}:{PASSWORD}@{HOSTNAME}/{DB_NAME}", pool_recycle=300
 )
+
+# Constante DB_PORT necesaria para sqlalchemy pueda conectarse bien en desarrollo
+# DB_PORT = "3308"
+# Este seria el engine que se utilizaria en desarrollo
+# engine = create_engine(f"mysql+mysqlconnector://root:123@localhost:{DB_PORT}/{DB_NAME}")
 
 
 # POST cargar_habitacion
