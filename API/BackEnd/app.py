@@ -33,7 +33,7 @@ def cargar_habitacion():
             500,
         )
 
-    return jsonify({"message": "Se ha agregado correctamente a la habitacion"}), 201
+    return jsonify({"message": "Se ha cargado correctamente a la habitacion"}), 201
 
 
 # POST cargar_clientes
@@ -53,7 +53,7 @@ def cargar_cliente():
             500,
         )
 
-    return jsonify({"message": "Se ha agregado correctamente al cliente"}), 201
+    return jsonify({"message": "Se ha cargado correctamente al cliente"}), 201
 
 
 # POST cargar_reserva
@@ -103,7 +103,7 @@ def cargar_reserva():
             500,
         )
 
-    return jsonify({"message": "Se ha agregado correctamente" + QUERY}), 201
+    return jsonify({"message": "Se ha cargado correctamente la reserva"}), 201
 
 
 # GET mostrar_habitaciones
@@ -315,10 +315,7 @@ def get_clientes_dni(dni):
 @app.route("/reserva_dni/<dni>", methods=["GET"])
 def get_reserva_por_dni(dni):
     conn = engine.connect()
-    QUERY = f"""SELECT reservas.*
-    FROM reservas
-    JOIN personas ON reservas.id_personas = personas.id_persona
-    WHERE personas.dni_persona = {dni};"""
+    QUERY = f"""SELECT reservas.* FROM reservas JOIN personas ON reservas.id_personas = personas.id_persona WHERE personas.dni_persona = {dni};"""
 
     try:
         result = conn.execute(text(QUERY))
