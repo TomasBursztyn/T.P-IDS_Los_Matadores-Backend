@@ -22,11 +22,10 @@ engine = create_engine(
     f"mysql+mysqldb://{USERNAME}:{PASSWORD}@{HOSTNAME}/{DB_NAME}", pool_recycle=300
 )
 
-# Constante DB_PORT necesaria para sqlalchemy pueda conectarse bien en desarrollo
-# DB_PORT = "3308"
 # Este seria el engine que se utilizaria en desarrollo
+# DB_PORT = "3306"
+# DB_NAME = "TP_IDS"
 # engine = create_engine(f"mysql+mysqlconnector://root:123@localhost:{DB_PORT}/{DB_NAME}")
-
 
 # POST cargar_habitacion
 @app.route("/cargar_habitacion", methods=["POST"])
@@ -241,7 +240,8 @@ def get_habitaciones_disponibles(fecha_inicio, fecha_fin, cantidad_personas):
         for row in result:
             entity = {}
             entity["id_habitacion"] = row.id_habitacion
-            entity["tipo_habitacion"] = row.tipo_habitacion
+            # Capitalizamos la primera letra de cada palabra de tipo_habitacion
+            entity["tipo_habitacion"] = row.tipo_habitacion.title()
             entity["precio_por_noche"] = row.precio_por_noche
             entity["cantidad_personas"] = row.cantidad_personas
 
