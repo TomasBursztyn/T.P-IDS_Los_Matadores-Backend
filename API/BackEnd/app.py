@@ -5,11 +5,18 @@ from sqlalchemy.exc import SQLAlchemyError
 
 app = Flask(__name__)
 
-DB_PORT = "3308"
-DB_NAME = "TP_IDS"
-BACKEND_PORT = 4000
 QUERY = ""
-engine = create_engine(f"mysql+mysqlconnector://root:123@localhost:{DB_PORT}/{DB_NAME}")
+BACKEND_PORT = 4000
+USERNAME = "LOS1MATADORESAPI"
+PASSWORD = "databasecontra123#"
+HOSTNAME = "LOS1MATADORESAPI.mysql.pythonanywhere-services.com"
+DB_NAME = "LOS1MATADORESAPI$default"
+# DB_PORT = "3308"
+# desarrollo: f"mysql+mysqlconnector://root:123@localhost:{DB_PORT}/{DB_NAME}"
+# https://help.pythonanywhere.com/pages/UsingSQLAlchemywithMySQL
+engine = create_engine(
+    f"mysql+mysqldb://{USERNAME}:{PASSWORD}@{HOSTNAME}/{DB_NAME}", pool_recycle=300
+)
 
 
 # POST cargar_habitacion
@@ -211,7 +218,7 @@ def get_habitaciones_disponibles(fecha_inicio, fecha_fin, cantidad_personas):
             jsonify({"message": f"Se ha producido un error: {str(err.__cause__)}"}),
             500,
         )
-    
+
     if result.rowcount != 0:
         data = []
         for row in result:
@@ -224,7 +231,7 @@ def get_habitaciones_disponibles(fecha_inicio, fecha_fin, cantidad_personas):
             data.append(entity)
 
         return jsonify(data), 200
-    
+
     return []
 
 
