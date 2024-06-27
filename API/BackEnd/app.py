@@ -23,7 +23,7 @@ engine = create_engine(
 )
 
 # Este seria el engine que se utilizaria en desarrollo
-# DB_PORT = "3306"
+# DB_PORT = "3308"
 # DB_NAME = "TP_IDS"
 # engine = create_engine(f"mysql+mysqlconnector://root:123@localhost:{DB_PORT}/{DB_NAME}")
 
@@ -337,6 +337,34 @@ def get_clientes_dni(dni):
 
     return jsonify({"message": f"El usuario con id {id} no existe"}), 404
 
+# GET reserva por id_habitacion, fecha_inicio y fecha_salida (para validar las reservas)
+@app.route("/reserva_validacion/<id_habitacion>/<fecha_inicio>/<fecha_salida>", methods=["GET"])
+def get_reserva(id_habitacion, fecha_inicio, fecha_salida):
+    conn = engine.connect()
+    QUERY = f"""SELECT * FROM reservas WHERE id_habitaciones = {id_habitacion} AND fecha_inicio = '{fecha_inicio}' AND fecha_salida = '{fecha_salida}';"""
+
+    try:
+        result = conn.execute(text(QUERY))
+        conn.close()
+    except SQLAlchemyError as err:
+        message = f"Error con la base de datos, al hacer un SELECT en get_reserva: {str(err.__cause__)}"
+        return (
+            jsonify({"message": message}),
+            500,
+        )
+
+    if result.rowcount != 0:
+        data = {}
+        row = result.first()
+        data["id_reserva"] = row[0]
+        data["id_habitaciones"] = row[1]
+        data["id_personas"] = row[2]
+        data["fecha_inicio"] = row[3]
+        data["fecha_salida"] = row[4]
+        data["total_a_pagar"] = row[5]
+        return jsonify(data), 200
+
+    return jsonify({"message": f"La reserva no existe"}), 404
 
 # GET reserva_dni por DNI
 @app.route("/reserva_dni/<dni>", methods=["GET"])
