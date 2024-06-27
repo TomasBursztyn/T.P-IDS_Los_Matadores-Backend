@@ -2,7 +2,7 @@
 
 * [BackEnd Deploy](https://los1matadoresapi.pythonanywhere.com/)
 * [FrontEnd Deploy](https://los1matadoresfront.pythonanywhere.com/)
-* [Documentacion](https://drive.google.com/file/d/1-EBHzEelHRzIKVtmZrLVnO0IL9yqgxFQ/view?usp=sharing)
+* [Documentacion](https://drive.google.com/file/d/1lWmtxHelgpfnWn9NAoCONxh7N8L6D1dI/view?usp=sharing)
 * [Trello](https://trello.com/b/K0HIyndU/tp-ids)
 * [Hitos.txt](https://github.com/TomasBursztyn/T.P-IDS-grupo-Los-matadores/files/15490617/Hitos.txt)
 
